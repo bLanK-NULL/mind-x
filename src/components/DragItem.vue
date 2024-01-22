@@ -1,0 +1,138 @@
+<template>
+  <!-- 从某个顶层节点开始的树都在一个DragItem组件里递归 -->
+  <div class="drag-item" ref="dragItem"
+    :style="{ left: props.itemData.pos.left + 'px', top: props.itemData.pos.top + 'px' }">
+    <div class="item" :style="{ cursor: props.itemData.isMoving ? 'grabbing' : 'grab' }">
+      <div class="content"  :contenteditable="contenteditable" @dblclick="handleEditTitle"
+        @blur="afterHandleEditTitle" @keyup.enter.ctrl="afterHandleEditTitle">
+        {{ props.itemData.title + props.itemData.level }}
+      </div>
+    </div>
+    <!-- 子节点 -->
+    <div class="children">
+      <DragItem :itemData="topItem" :level="topItem.level" v-for="topItem of props.itemData.children" :key="topItem.id">
+      </DragItem>
+    </div>
+    <!-- 起点节点保存连线 -->
+    <div class="s-line" v-if="props.itemData.node">
+      <svg v-for="topItem of props.itemData.children" :key="topItem.id" :style="{
+        left: Math.min(topItem.pos.left, 0) + 'px', top: Math.min(topItem.pos.top, 0) + 'px',
+        width: Math.max(props.itemData.rect.width, topItem.pos.left + topItem.rect.width) - Math.min(topItem.pos.left, 0) + 'px',
+        height: Math.max(props.itemData.rect.height, topItem.pos.top + topItem.rect.height) - Math.min(topItem.pos.top, 0) + 'px'
+      }">
+        <line :x1="props.itemData.rect.width / 2 - Math.min(topItem.pos.left, 0)"
+          :y1="props.itemData.rect.height / 2 - Math.min(topItem.pos.top, 0)"
+          :x2="topItem.pos.left + topItem.rect.width / 2 - Math.min(topItem.pos.left, 0)"
+          :y2="topItem.pos.top + topItem.rect.height / 2 - Math.min(topItem.pos.top, 0)" stroke="crimson"
+          stroke-width="2" />
+      </svg>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import DragItem from '@/components/DragItem.vue'
+import { computed, nextTick, onMounted, ref } from 'vue';
+import { customSelect } from '@/utils/index.js'
+const props = defineProps({
+  itemData: {
+    type: Object,
+    default: () => {
+      return {}
+    }
+  },
+  level: {
+    type: Number,
+    default: 0
+  }
+})
+const contenteditable = ref(false)
+const dragItem = ref(null)
+//先触发里层的也就是最里层的
+onMounted(() => {
+  //绑定node
+  props.itemData.mount(dragItem.value)
+
+  //移动逻辑
+  let mousedownListener = null;
+  const handleMousedown = function (e) {
+    console.log('mousedown');
+    e.stopPropagation()
+    props.itemData.isMoving = true;
+    this.addEventListener('mousemove', handleMouseMove, false)
+    this.addEventListener('mouseup', handleMouseUpOrLeave, false)
+    this.addEventListener('mouseleave', handleMouseUpOrLeave, false)
+  }
+  const handleMouseMove = function (e) {
+    // console.log('mousemove');
+    props.itemData.pos.left += e.movementX
+    props.itemData.pos.top += e.movementY
+
+  }
+  const handleMouseUpOrLeave = function (e) {
+    console.log('mouseup || mouseleave');
+    this.removeEventListener('mousemove', handleMouseMove, false)
+    this.removeEventListener('mouseup', handleMouseUpOrLeave, false)
+    this.removeEventListener('mouseleave', handleMouseUpOrLeave, false)
+    props.itemData.isMoving = false;
+  }
+  //给dragItem 下的item 绑定事件， 但是移动的是整个dragItem
+  props.itemData.node.firstElementChild.addEventListener('mousedown', handleMousedown, false)
+
+})
+
+  /**
+   * dblclick事件 修改title 的函数
+   */
+   async function handleEditTitle(e) {
+    const el = e.currentTarget;
+    console.log('doubleclick');
+    console.log(el)
+    if (!contenteditable.value) {
+      contenteditable.value = true;
+      await nextTick()
+      //聚焦
+      el.focus()
+      //选中所有 & 可能用户会修改内容
+      customSelect(el) 
+    }
+  }
+  // blur和keyup.enter.ctrl 修改结束 的函数
+  function afterHandleEditTitle() {
+    contenteditable.value = false;
+    props.itemData.updateRect()
+    console.log(props.itemData.node);
+  }
+
+</script>
+
+<style  scoped>
+.drag-item {
+  z-index: 9;
+  display: inline-block;
+  position: absolute;
+}
+
+.drag-item>.item {
+  box-sizing: border-box;
+  /* 带定min-width */
+  min-width: 78px;
+  width: fit-content;
+  background-color: aquamarine;
+  border-radius: 4px;
+  overflow: hidden;
+  padding: 18px 12px;
+}
+
+.drag-item>.item>.content {
+  user-select: none;
+  min-height: 20.8px;
+  min-width: 10px;
+}
+
+.drag-item svg {
+  position: absolute;
+  z-index: -9;
+
+}
+</style>

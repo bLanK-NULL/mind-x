@@ -8,6 +8,8 @@
   },
   "dependencies": {
     "core-js": "^3.8.3",
+    "pinia": "^2.1.7",
+    "uuid": "^9.0.1",
     "vue": "^3.2.13"
   },
   "devDependencies": {
