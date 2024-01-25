@@ -1,7 +1,8 @@
 <template>
   <div class="container">
     <div class="designer">
-      <DragItem :itemData="topItem" :level=topItem.level v-for="topItem of itemsStore.topItems" :key="topItem.id"></DragItem>
+      <DragItem :itemData="topItem" :level=topItem.level v-for="topItem of itemsStore.topItems" :key="topItem.id">
+      </DragItem>
       <!-- 顶级节点的连出去的svg必须在这里划 -->
       <!-- <svg >
       <g>
@@ -13,42 +14,36 @@
 </template>
 
 <script setup>
-import { nextTick } from 'vue';
+import { nextTick, onBeforeMount, onMounted } from 'vue';
 import DragItem from './components/DragItem.vue';
+import { useThemeStore } from '@/store/theme'
 import { useItemsStore } from '@/store/index'
+const themeStore = useThemeStore()
+themeStore.setThemeConf() // 设置为默认主题 
 const itemsStore = useItemsStore()
 
 const node1 = itemsStore.createDragItem(null)
 const node2 = itemsStore.createDragItem(node1)
-nextTick()
-node1.pos.left = 100
-node1.pos.top = 100
-node2.pos.left = 100
-node2.pos.top = 100
 const node3 = itemsStore.createDragItem(node2)
-node3.pos.left = 80
-node3.pos.top = 80
-const node4 = itemsStore.createDragItem(node2)
-node4.pos.left = 80
-node4.pos.top = 20
+// const node3 = itemsStore.createDragItem(node2)
 console.log(itemsStore.topItems);
+
+onMounted(() => {
+  nextTick(() => {
+    window.scrollTo(10000 - 0.5 * window.innerWidth, 10000 - 0.5 * window.innerHeight)
+  })
+})
 </script>
  
-<style scoped>
-* {
-  margin: 0;
-  padding: 0;
-}
+<style scoped> .designer {
+   width: 20000px;
+   height: 20000px;
+   background: antiquewhite;
+   position: relative;
+ }
 
-.designer {
-  width: 20000px;
-  height: 20000px;
-  background: antiquewhite;
-  position: relative;
-}
-
-svg {
-  width: 100%;
-  height: 100%;
-}
+ svg {
+   width: 100%;
+   height: 100%;
+ }
 </style>

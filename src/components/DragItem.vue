@@ -3,8 +3,8 @@
   <div class="drag-item" ref="dragItem"
     :style="{ left: props.itemData.pos.left + 'px', top: props.itemData.pos.top + 'px' }">
     <div class="item" :style="{ cursor: props.itemData.isMoving ? 'grabbing' : 'grab' }">
-      <div class="content"  :contenteditable="contenteditable" @dblclick="handleEditTitle"
-        @blur="afterHandleEditTitle" @keyup.enter.ctrl="afterHandleEditTitle">
+      <div class="content" :contenteditable="contenteditable" @dblclick="handleEditTitle" @blur="afterHandleEditTitle"
+        @keyup.enter.ctrl="afterHandleEditTitle">
         {{ props.itemData.title + props.itemData.level }}
       </div>
     </div>
@@ -53,56 +53,51 @@ onMounted(() => {
   //绑定node
   props.itemData.mount(dragItem.value)
 
-  //移动逻辑
-  let mousedownListener = null;
+  //移动逻辑 
+  let x, y, domX, domY;
   const handleMousedown = function (e) {
-    console.log('mousedown');
+    x = e.clientX;
+    y = e.clientY;
+    domX = props.itemData.pos.left;
+    domY = props.itemData.pos.top;
     e.stopPropagation()
     props.itemData.isMoving = true;
-    this.addEventListener('mousemove', handleMouseMove, false)
-    this.addEventListener('mouseup', handleMouseUpOrLeave, false)
-    this.addEventListener('mouseleave', handleMouseUpOrLeave, false)
+    document.addEventListener('mousemove', handleMouseMove, false)
+    this.addEventListener('mouseup', handleMouseUp, false)
   }
   const handleMouseMove = function (e) {
-    // console.log('mousemove');
-    props.itemData.pos.left += e.movementX
-    props.itemData.pos.top += e.movementY
-
+    if (props.itemData.isMoving) {
+      props.itemData.pos.left  = domX + e.clientX - x
+      props.itemData.pos.top = domY + e.clientY - y 
+    }
   }
-  const handleMouseUpOrLeave = function (e) {
-    console.log('mouseup || mouseleave');
-    this.removeEventListener('mousemove', handleMouseMove, false)
-    this.removeEventListener('mouseup', handleMouseUpOrLeave, false)
-    this.removeEventListener('mouseleave', handleMouseUpOrLeave, false)
-    props.itemData.isMoving = false;
+  const handleMouseUp = function (e) {
+    props.itemData.isMoving = false
   }
   //给dragItem 下的item 绑定事件， 但是移动的是整个dragItem
   props.itemData.node.firstElementChild.addEventListener('mousedown', handleMousedown, false)
 
 })
 
-  /**
-   * dblclick事件 修改title 的函数
-   */
-   async function handleEditTitle(e) {
-    const el = e.currentTarget;
-    console.log('doubleclick');
-    console.log(el)
-    if (!contenteditable.value) {
-      contenteditable.value = true;
-      await nextTick()
-      //聚焦
-      el.focus()
-      //选中所有 & 可能用户会修改内容
-      customSelect(el) 
-    }
+/**
+ * dblclick事件 修改title 的函数
+ */
+async function handleEditTitle(e) {
+  const el = e.currentTarget;
+  if (!contenteditable.value) {
+    contenteditable.value = true;
+    await nextTick()
+    //聚焦
+    el.focus()
+    //选中所有 & 可能用户会修改内容
+    customSelect(el)
   }
-  // blur和keyup.enter.ctrl 修改结束 的函数
-  function afterHandleEditTitle() {
-    contenteditable.value = false;
-    props.itemData.updateRect()
-    console.log(props.itemData.node);
-  }
+}
+// blur和keyup.enter.ctrl 修改结束 的函数
+function afterHandleEditTitle() {
+  contenteditable.value = false;
+  props.itemData.updateRect()
+}
 
 </script>
 
@@ -118,7 +113,7 @@ onMounted(() => {
   /* 带定min-width */
   min-width: 78px;
   width: fit-content;
-  background-color: aquamarine;
+  background-color: rgb(3, 134, 249);
   border-radius: 4px;
   overflow: hidden;
   padding: 18px 12px;
