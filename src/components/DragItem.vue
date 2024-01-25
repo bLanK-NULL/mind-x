@@ -2,7 +2,9 @@
   <!-- 从某个顶层节点开始的树都在一个DragItem组件里递归 -->
   <div class="drag-item" ref="dragItem"
     :style="{ left: props.itemData.pos.left + 'px', top: props.itemData.pos.top + 'px' }">
-    <div class="item" :style="{ cursor: props.itemData.isMoving ? 'grabbing' : 'grab' }">
+    <div class="item" :class="{ 'selected-item': isSelectedItem }"
+      :style="{ cursor: props.itemData.isMoving ? 'grabbing' : 'grab' }" 
+      @click="handleClickItem" >
       <div class="content" :contenteditable="contenteditable" @dblclick="handleEditTitle" @blur="afterHandleEditTitle"
         @keyup.enter.ctrl="afterHandleEditTitle">
         {{ props.itemData.title + props.itemData.level }}
@@ -48,6 +50,7 @@ const props = defineProps({
 })
 const contenteditable = ref(false)
 const dragItem = ref(null)
+
 //先触发里层的也就是最里层的
 onMounted(() => {
   //绑定node
@@ -67,8 +70,8 @@ onMounted(() => {
   }
   const handleMouseMove = function (e) {
     if (props.itemData.isMoving) {
-      props.itemData.pos.left  = domX + e.clientX - x
-      props.itemData.pos.top = domY + e.clientY - y 
+      props.itemData.pos.left = domX + e.clientX - x
+      props.itemData.pos.top = domY + e.clientY - y
     }
   }
   const handleMouseUp = function (e) {
@@ -99,6 +102,15 @@ function afterHandleEditTitle() {
   props.itemData.updateRect()
 }
 
+
+/**
+ * 选择item (点击, 框选?)
+ */
+const isSelectedItem = ref(false)
+function handleClickItem() {
+  isSelectedItem.value = !isSelectedItem.value
+}
+
 </script>
 
 <style  scoped>
@@ -117,6 +129,14 @@ function afterHandleEditTitle() {
   border-radius: 4px;
   overflow: hidden;
   padding: 18px 12px;
+}
+
+.drag-item>.item:hover {
+  box-shadow: 0px 0px 2px 3px rgba(50, 50, 50, 0.2);
+}
+
+.selected-item {
+  border: 3px solid black;
 }
 
 .drag-item>.item>.content {
