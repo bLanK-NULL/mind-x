@@ -116,7 +116,6 @@ function afterHandleEditTitle() {
 /**
  * 选择item (点击, 框选?)
  */
-const emits = defineEmits(['selectOver'])
 const isSelectedItem = ref(false)
 function handleClickItem() {
   isSelectedItem.value = !isSelectedItem.value

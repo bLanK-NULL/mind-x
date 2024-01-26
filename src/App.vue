@@ -8,7 +8,7 @@
         top: maskRect.top - designer.getBoundingClientRect().y + 'px',
       }"></div>
       <DragItem :selectNum="selectNum" :maskRect="maskRect" :showSelectMask="showSelectMask" :itemData="topItem"
-        :level=topItem.level v-for="topItem of itemsStore.topItems" :key="topItem.id" @selectOver="selectOver">
+        :level=topItem.level v-for="topItem of itemsStore.topItems" :key="topItem.id">
       </DragItem>
       <!-- 顶级节点的连出去的svg必须在这里划 -->
       <!-- <svg >
@@ -77,9 +77,7 @@ onMounted(() => {
     }
   })
 })
-function selectOver(dragItem) {
 
-}
 
 </script>
  
