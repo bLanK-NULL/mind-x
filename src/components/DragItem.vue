@@ -3,8 +3,7 @@
   <div class="drag-item" ref="dragItem"
     :style="{ left: props.itemData.pos.left + 'px', top: props.itemData.pos.top + 'px' }">
     <div class="item" :class="{ 'selected-item': isSelectedItem }"
-      :style="{ cursor: props.itemData.isMoving ? 'grabbing' : 'grab' }" 
-      @click="handleClickItem" >
+      :style="{ cursor: props.itemData.isMoving ? 'grabbing' : 'grab' }" @click="handleClickItem">
       <div class="content" :contenteditable="contenteditable" @dblclick="handleEditTitle" @blur="afterHandleEditTitle"
         @keyup.enter.ctrl="afterHandleEditTitle">
         {{ props.itemData.title + props.itemData.level }}
