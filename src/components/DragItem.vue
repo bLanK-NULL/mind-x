@@ -11,7 +11,8 @@
     </div>
     <!-- 子节点 -->
     <div class="children">
-      <DragItem :itemData="topItem" :level="topItem.level" v-for="topItem of props.itemData.children" :key="topItem.id">
+      <DragItem :selectNum="selectNum" :maskRect="maskRect" :showSelectMask="showSelectMask" :itemData="topItem"
+        :level="topItem.level" v-for="topItem of props.itemData.children" :key="topItem.id">
       </DragItem>
     </div>
     <!-- 起点节点保存连线 -->
@@ -33,7 +34,7 @@
 
 <script setup>
 import DragItem from '@/components/DragItem.vue'
-import { computed, nextTick, onMounted, ref } from 'vue';
+import { computed, nextTick, onMounted, reactive, ref, watchEffect, watch } from 'vue';
 import { customSelect } from '@/utils/index.js'
 const props = defineProps({
   itemData: {
@@ -43,6 +44,16 @@ const props = defineProps({
     }
   },
   level: {
+    type: Number,
+    default: 0
+  },
+  maskRect: {
+    type: Object
+  },
+  showSelectMask: {
+    type: Boolean
+  },
+  selectNum: {
     type: Number,
     default: 0
   }
@@ -105,11 +116,29 @@ function afterHandleEditTitle() {
 /**
  * 选择item (点击, 框选?)
  */
+const emits = defineEmits(['selectOver'])
 const isSelectedItem = ref(false)
 function handleClickItem() {
   isSelectedItem.value = !isSelectedItem.value
 }
+//框选
+onMounted(() => {
+  //被框中的条件
+  watch(() => props.selectNum, () => {
+    // console.log(props.maskRect.width)
+    const dragItemRect = {
+      width: props.itemData.node.getBoundingClientRect().width,
+      height: props.itemData.node.getBoundingClientRect().height,
+      centerY: props.itemData.node.getBoundingClientRect().y + props.itemData.node.getBoundingClientRect().height / 2,
+      centerX: props.itemData.node.getBoundingClientRect().x + props.itemData.node.getBoundingClientRect().width / 2,
+    }
+    if ((props.maskRect.height > dragItemRect.height / 2 && props.maskRect.top < dragItemRect.centerY && props.maskRect.top + props.maskRect.height > dragItemRect.centerY)
+      && (props.maskRect.width > dragItemRect.width / 2 && props.maskRect.left < dragItemRect.centerX && props.maskRect.left + props.maskRect.width > dragItemRect.centerX)) {
+      isSelectedItem.value = !isSelectedItem.value
+    }
 
+  })
+})
 </script>
 
 <style  scoped>
