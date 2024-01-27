@@ -25,7 +25,6 @@ export const useItemsStore = defineStore('items', () => {
             this.children = []
             this.level = this.parent ? this.parent.level + 1 : 0 // level = praent.level +1
             this.node = null; //挂载的dragItem节点
-            this.content = '';
         }
         //== 无用 ==
         move(event) {

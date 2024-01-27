@@ -5,8 +5,7 @@
     <div class="item" :class="{ 'selected-item': isSelectedItem }"
       :style="{ cursor: props.itemData.isMoving ? 'grabbing' : 'grab' }" @click="handleClickItem">
       <div class="content" :contenteditable="contenteditable" @dblclick="handleEditTitle" @blur="afterHandleEditTitle"
-        @keyup.enter.ctrl="afterHandleEditTitle">
-        {{ props.itemData.title + props.itemData.level }}
+        @keyup.enter.ctrl="contenteditable = false" v-html="props.itemData.title">
       </div>
     </div>
     <!-- 子节点 -->
@@ -107,8 +106,8 @@ async function handleEditTitle(e) {
   }
 }
 // blur和keyup.enter.ctrl 修改结束 的函数
-function afterHandleEditTitle() {
-  contenteditable.value = false;
+function afterHandleEditTitle(e) {
+  props.itemData.title = e.currentTarget.innerHTML
   props.itemData.updateRect()
 }
 
