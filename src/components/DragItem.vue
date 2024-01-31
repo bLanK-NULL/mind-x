@@ -153,7 +153,6 @@ watch(() => props.tabNum, () => {
   if (isSelectedItem.value) {
     const newDragItem = itemsStore.createDragItem(props.itemData)
     isSelectedItem.value = false
-    // newDragItem.InitialPosition()
   }
 })
 onMounted(() => {

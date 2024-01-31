@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, onMounted, h, computed, watch, onBeforeUpdate, reactive } from 'vue'
+import { ref, onMounted, h, computed, watch, onBeforeUpdate, reactive, toRef } from 'vue'
 const uuidv4 = require('uuid').v4;
 
 
@@ -27,9 +27,11 @@ export const useItemsStore = defineStore('items', () => {
         }
         // 挂载到真实节点上的一系列操作
         mount(node) {
+            // console.log('mount  this.node', this.node);
             this.node = node;
-            this.rect.width = this.node.getBoundingClientRect().width;
-            this.rect.height = this.node.getBoundingClientRect().height;
+            this.rect.width = node.getBoundingClientRect().width;
+            this.rect.height = node.getBoundingClientRect().height;
+            this.InitialPosition() //tab加的节点走不了App节点的onMounted
         }
         //更新节点width和height的数据
         updateRect() {
@@ -40,13 +42,15 @@ export const useItemsStore = defineStore('items', () => {
         //创建一个节点时，初始位置
         InitialPosition() {
             if (this.parent) {
+                // console.log('initialPosition', this.level, this.parent.rect.height, this.rect.height);
                 this.pos.left = this.parent.rect.width + getThemeConf().horizonGap
                 this.pos.top = (this.parent.rect.height - this.rect.height) / 2
             } else {
                 this.pos.left = 10000
                 this.pos.top = 10000
             }
-            console.log('initialPosition', this.parent && this.parent.rect.width);
+            // 初始调用本方法时,parent.rect没数据
+
         }
     }
     //所有顶层节点， 一般是一个顶级节点，（以后可能拓展游离节点）
@@ -58,24 +62,15 @@ export const useItemsStore = defineStore('items', () => {
         if (parent) {
             newDragItem = new DragItems(parent)
             parent.children.push(newDragItem)
-            // onMounted(() => {
-            //     console.log(' pinia onmounted');
-            //     newDragItem.pos.left = newDragItem.parent.rect.width + getThemeConf().horizonGap
-            //     newDragItem.pos.top = (newDragItem.parent.rect.height - newDragItem.rect.height) / 2
-            // })
-
-
+            onMounted(() => { //初始节点的初始位置
+                console.log(' pinia onmounted');
+                newDragItem.InitialPosition()
+            })
 
         } else { //顶层节点
             newDragItem = new DragItems()
             topItems.value.push(newDragItem)
-            //中心节点的样式--于视口居中
-
-            // newDragItem.pos.left = 10000
-            // newDragItem.pos.top = 10000
         }
-        // 初始化位置
-        newDragItem.InitialPosition()
 
         return newDragItem
     }
