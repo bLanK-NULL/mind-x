@@ -5,7 +5,7 @@ module.exports = {
     0: {
         fontSize: '24px',
         color: 'black',
-        backgroundColor: 'rgb(3, 134, 249)',
+        backgroundColor: 'rgb(2, 164, 245)',
     },
     1: {
         fontSize: '20px',
@@ -21,5 +21,6 @@ module.exports = {
         fontSize: '14px',
         color: 'black',
         backgroundColor: 'rgb(2, 245, 209)',
-    }
+    },
+    maxDep: 3 //主题最大有效深度
 }

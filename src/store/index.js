@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, onMounted, h, computed, watch } from 'vue'
-import { useThemeStore } from '@/store/theme'
+import { ref, onMounted, h, computed, watch, onBeforeUpdate, reactive } from 'vue'
 const uuidv4 = require('uuid').v4;
 
 
@@ -10,14 +9,14 @@ export const useItemsStore = defineStore('items', () => {
     class DragItems {
         constructor(parent) {
             // 相对父节点的绝对定位的位置
-            this.pos = {
+            this.pos = reactive({
                 left: 0,
                 top: 0,
-            }
-            this.rect = {
-                width: ref(0),
-                height: ref(0)
-            }
+            })
+            this.rect = reactive({
+                width: 0,
+                height: 0
+            })
             this.isMoving = ref(false)
             this.title = 'default'
             this.id = uuidv4()
@@ -25,14 +24,6 @@ export const useItemsStore = defineStore('items', () => {
             this.children = []
             this.level = this.parent ? this.parent.level + 1 : 0 // level = praent.level +1
             this.node = null; //挂载的dragItem节点
-        }
-        //== 无用 ==
-        move(event) {
-            if (this.isMoving) {
-                this.node && (this.node.style.cursor = 'grabbing')
-                this.pos.left += event.movementX;
-                this.pos.top += event.movementY;
-            }
         }
         // 挂载到真实节点上的一系列操作
         mount(node) {
@@ -46,6 +37,17 @@ export const useItemsStore = defineStore('items', () => {
                 this.mount(this.node)
             }
         }
+        //创建一个节点时，初始位置
+        InitialPosition() {
+            if (this.parent) {
+                this.pos.left = this.parent.rect.width + getThemeConf().horizonGap
+                this.pos.top = (this.parent.rect.height - this.rect.height) / 2
+            } else {
+                this.pos.left = 10000
+                this.pos.top = 10000
+            }
+            console.log('initialPosition', this.parent && this.parent.rect.width);
+        }
     }
     //所有顶层节点， 一般是一个顶级节点，（以后可能拓展游离节点）
     const topItems = ref([])
@@ -56,13 +58,12 @@ export const useItemsStore = defineStore('items', () => {
         if (parent) {
             newDragItem = new DragItems(parent)
             parent.children.push(newDragItem)
+            // onMounted(() => {
+            //     console.log(' pinia onmounted');
+            //     newDragItem.pos.left = newDragItem.parent.rect.width + getThemeConf().horizonGap
+            //     newDragItem.pos.top = (newDragItem.parent.rect.height - newDragItem.rect.height) / 2
+            // })
 
-            //新节点相对于父节点的位置
-            const themeStore = useThemeStore(); 
-
-            watch(newDragItem.parent.rect.width, ()=> {
-                newDragItem.pos.left = newDragItem.parent.rect.width.value + themeStore.themeConf.horizonGap
-            })
 
 
         } else { //顶层节点
@@ -70,15 +71,23 @@ export const useItemsStore = defineStore('items', () => {
             topItems.value.push(newDragItem)
             //中心节点的样式--于视口居中
 
-            newDragItem.pos.left = 10000
-            newDragItem.pos.top = 10000
+            // newDragItem.pos.left = 10000
+            // newDragItem.pos.top = 10000
         }
-        //渲染一次
+        // 初始化位置
+        newDragItem.InitialPosition()
 
         return newDragItem
     }
+    const themename = ref('default')
+    function getThemeConf() {
+        const theme = require(`@/theme/${themename.value}.js`)
+        return theme
 
+    }
     return {
+        themename,
+        getThemeConf,
         topItems,
         createDragItem
     }

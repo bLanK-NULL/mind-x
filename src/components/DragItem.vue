@@ -10,17 +10,18 @@
     </div>
     <!-- 子节点 -->
     <div class="children">
-      <DragItem :selectNum="selectNum" :maskRect="maskRect" :showSelectMask="showSelectMask" :itemData="topItem"
-        :level="topItem.level" v-for="topItem of props.itemData.children" :key="topItem.id">
+      <DragItem :tabNum="tabNum" :selectNum="selectNum" :maskRect="maskRect" :showSelectMask="showSelectMask"
+        :itemData="topItem" :level="topItem.level" v-for=" topItem  of  props.itemData.children " :key="topItem.id">
       </DragItem>
     </div>
     <!-- 起点节点保存连线 -->
-    <div class="s-line" v-if="props.itemData.node">
-      <svg v-for="topItem of props.itemData.children" :key="topItem.id" :style="{
+    <div class="s-line" v-if="props.itemData.node && props.itemData.rect.width !== 0">
+      <svg v-for=" topItem  of  props.itemData.children " :key="topItem.id" :style="{
         left: Math.min(topItem.pos.left, 0) + 'px', top: Math.min(topItem.pos.top, 0) + 'px',
         width: Math.max(props.itemData.rect.width, topItem.pos.left + topItem.rect.width) - Math.min(topItem.pos.left, 0) + 'px',
         height: Math.max(props.itemData.rect.height, topItem.pos.top + topItem.rect.height) - Math.min(topItem.pos.top, 0) + 'px'
-      }">
+      }
+        ">
         <line :x1="props.itemData.rect.width / 2 - Math.min(topItem.pos.left, 0)"
           :y1="props.itemData.rect.height / 2 - Math.min(topItem.pos.top, 0)"
           :x2="topItem.pos.left + topItem.rect.width / 2 - Math.min(topItem.pos.left, 0)"
@@ -33,8 +34,10 @@
 
 <script setup>
 import DragItem from '@/components/DragItem.vue'
-import { computed, nextTick, onMounted, reactive, ref, watchEffect, watch } from 'vue';
+import { computed, nextTick, onMounted, reactive, ref, watchEffect, watch, onBeforeUpdate, toRef } from 'vue';
 import { customSelect } from '@/utils/index.js'
+import { useItemsStore } from '@/store/index'
+const itemsStore = useItemsStore()
 const props = defineProps({
   itemData: {
     type: Object,
@@ -55,10 +58,15 @@ const props = defineProps({
   selectNum: {
     type: Number,
     default: 0
+  },
+  tabNum: {
+    type: Number,
+    default: 0
   }
 })
 const contenteditable = ref(false)
 const dragItem = ref(null)
+const themeCof = toRef(itemsStore.getThemeConf())
 
 //先触发里层的也就是最里层的
 onMounted(() => {
@@ -98,6 +106,7 @@ async function handleEditTitle(e) {
   const el = e.currentTarget;
   if (!contenteditable.value) {
     contenteditable.value = true;
+    isSelectedItem.value = true
     await nextTick()
     //聚焦
     el.focus()
@@ -108,6 +117,7 @@ async function handleEditTitle(e) {
 // blur和keyup.enter.ctrl 修改结束 的函数
 function afterHandleEditTitle(e) {
   props.itemData.title = e.currentTarget.innerHTML
+  contenteditable.value = false
   props.itemData.updateRect()
 }
 
@@ -137,6 +147,19 @@ onMounted(() => {
 
   })
 })
+
+//处理tab -- isSelectedItem增加子节点
+watch(() => props.tabNum, () => {
+  if (isSelectedItem.value) {
+    const newDragItem = itemsStore.createDragItem(props.itemData)
+    isSelectedItem.value = false
+    // newDragItem.InitialPosition()
+  }
+})
+onMounted(() => {
+  console.log(props.itemData.id, props.itemData.parent);
+
+})
 </script>
 
 <style  scoped>
@@ -151,10 +174,11 @@ onMounted(() => {
   /* 带定min-width */
   min-width: 78px;
   width: fit-content;
-  background-color: rgb(3, 134, 249);
   border-radius: 4px;
   overflow: hidden;
   padding: 18px 12px;
+  background-color: v-bind('themeCof[props.itemData.level <= themeCof.maxDep ? props.itemData.level : themeCof.maxDep].backgroundColor');
+  font-size: v-bind('themeCof[props.itemData.level <= themeCof.maxDep ? props.itemData.level : themeCof.maxDep].fontSize');
 }
 
 .drag-item>.item:hover {
@@ -162,13 +186,18 @@ onMounted(() => {
 }
 
 .selected-item {
-  border: 3px solid black;
+  /*border: 3px solid black;*/
+  box-shadow: 0px 0px 3px 2px rgb(4, 229, 49) !important;
 }
 
 .drag-item>.item>.content {
   user-select: none;
   min-height: 20.8px;
   min-width: 10px;
+}
+
+.item>.content[contenteditable="true"]:focus {
+  outline: none;
 }
 
 .drag-item svg {
