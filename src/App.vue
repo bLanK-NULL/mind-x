@@ -28,8 +28,7 @@ const itemsStore = useItemsStore()
 
 const node1 = itemsStore.createDragItem(null)
 const node2 = itemsStore.createDragItem(node1)
-const node3 = itemsStore.createDragItem(node2)
-const node4 = itemsStore.createDragItem(node2)
+const node3 = itemsStore.createDragItem(node1)
 console.log(itemsStore.topItems);
 
 onMounted(() => {

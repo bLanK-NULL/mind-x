@@ -43,14 +43,25 @@ export const useItemsStore = defineStore('items', () => {
         InitialPosition() {
             if (this.parent) {
                 // console.log('initialPosition', this.level, this.parent.rect.height, this.rect.height);
+                const len = this.parent.children.length
+                this.parent.children.forEach((item, idx) => {
+                    item.pos.top = (idx - (len - 1) / 2) * (item.rect.height + getThemeConf().verticalGap) - item.rect.height / 2 + item.parent.rect.height / 2
+                })
                 this.pos.left = this.parent.rect.width + getThemeConf().horizonGap
-                this.pos.top = (this.parent.rect.height - this.rect.height) / 2
-            } else {
-                this.pos.left = 10000
-                this.pos.top = 10000
+                // this.pos.top = (this.parent.rect.height - this.rect.height) / 2
+            } else { // 新加的节点是根节点
+                const len = topItems.value.length
+                topItems.value.forEach((item, idx) => {
+                    item.pos.top = (idx - (len - 1) / 2) * (item.rect.height + getThemeConf().verticalGap) - item.rect.height / 2 + 10000
+                })
+                this.pos.left = 9900
             }
             // 初始调用本方法时,parent.rect没数据
-
+        }
+        // 新节点创建时，被挤开
+        squeezeOut(left, top) {
+            this.pos.left += left;
+            this.pos.top += top;
         }
     }
     //所有顶层节点， 一般是一个顶级节点，（以后可能拓展游离节点）
@@ -63,7 +74,6 @@ export const useItemsStore = defineStore('items', () => {
             newDragItem = new DragItems(parent)
             parent.children.push(newDragItem)
             onMounted(() => { //初始节点的初始位置
-                console.log(' pinia onmounted');
                 newDragItem.InitialPosition()
             })
 

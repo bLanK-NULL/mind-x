@@ -155,10 +155,6 @@ watch(() => props.tabNum, () => {
     isSelectedItem.value = false
   }
 })
-onMounted(() => {
-  console.log(props.itemData.id, props.itemData.parent);
-
-})
 </script>
 
 <style  scoped>
