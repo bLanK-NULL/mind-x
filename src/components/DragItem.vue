@@ -34,7 +34,7 @@
 
 <script setup>
 import DragItem from '@/components/DragItem.vue'
-import { computed, nextTick, onMounted, reactive, ref, watchEffect, watch, onBeforeUpdate, toRef } from 'vue';
+import { computed, nextTick, onMounted, reactive, ref, watchEffect, watch, onBeforeUpdate, toRef, inject } from 'vue';
 import { customSelect } from '@/utils/index.js'
 import { useItemsStore } from '@/store/index'
 const itemsStore = useItemsStore()
@@ -154,6 +154,18 @@ watch(() => props.tabNum, () => {
     const newDragItem = itemsStore.createDragItem(props.itemData)
     isSelectedItem.value = false
   }
+})
+
+/**
+ * del键删除节点
+ */
+ onMounted(() => {
+  function handleDel(e) {
+    if(e.key==='Delete' && isSelectedItem.value && dragItem.value) {
+      props.itemData.del()
+    }
+  }
+  document.addEventListener('keydown', handleDel, true)
 })
 </script>
 

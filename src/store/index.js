@@ -63,6 +63,18 @@ export const useItemsStore = defineStore('items', () => {
             this.pos.left += left;
             this.pos.top += top;
         }
+        //删除当前节点
+        del() {
+            if(this.parent) {
+                const idx = this.parent.children.findIndex(item => item === this)
+                this.parent.children.splice(idx, 1)
+            }else {
+                const idx = topItems.value.findIndex(item => item === this)
+                topItems.value.splice(idx, 1)
+            }
+            //调整剩余节点位置
+            this.InitialPosition()
+        }
     }
     //所有顶层节点， 一般是一个顶级节点，（以后可能拓展游离节点）
     const topItems = ref([])

@@ -21,7 +21,7 @@
 </template>
 
 <script setup>
-import { nextTick, onBeforeMount, onMounted, reactive, ref, toRef } from 'vue';
+import { nextTick, onBeforeMount, onMounted, provide, reactive, ref, toRef } from 'vue';
 import DragItem from './components/DragItem.vue';
 import { useItemsStore } from '@/store/index'
 const itemsStore = useItemsStore()
