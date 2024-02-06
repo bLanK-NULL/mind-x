@@ -2,6 +2,7 @@ module.exports = {
     name: 'default',
     horizonGap: 80,
     verticalGap: 40,
+    baseBackgroundColor: '#fff',
     0: {
         fontSize: '24px',
         color: 'black',

@@ -2,8 +2,12 @@
   <!-- 从某个顶层节点开始的树都在一个DragItem组件里递归 -->
   <div class="drag-item" ref="dragItem"
     :style="{ left: props.itemData.pos.left + 'px', top: props.itemData.pos.top + 'px' }">
-    <div class="item" :class="{ 'selected-item': isSelectedItem }"
-      :style="{ cursor: props.itemData.isMoving ? 'grabbing' : 'default' }" @click="handleClickItem">
+    <div class="item" :class="{ 'selected-item': isSelectedItem }" :style="{
+      cursor: props.itemData.isMoving ? 'grabbing' : 'default',
+      'background-color': bgcStyle,
+      'font-size': ftStyle,
+      'color': ftColorStyle,
+    }" @click="handleClickItem">
       <div class="content" :contenteditable="contenteditable" @dblclick="handleEditTitle" @blur="afterHandleEditTitle"
         @keyup.enter.ctrl="contenteditable = false" v-html="props.itemData.title">
       </div>
@@ -33,9 +37,10 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, reactive, ref, watchEffect, watch, onBeforeUpdate, toRef, inject } from 'vue';
+import { computed, nextTick, onMounted, reactive, ref, watchEffect, watch, onBeforeUpdate, toRef, inject, onBeforeMount } from 'vue';
 import { customSelect } from '@/utils/index.js'
 import { useItemsStore } from '@/store/index'
+import { storeToRefs } from 'pinia';
 const itemsStore = useItemsStore()
 const props = defineProps({
   itemData: {
@@ -65,7 +70,16 @@ const props = defineProps({
 })
 const contenteditable = ref(false)
 const dragItem = ref(null)
-const themeCof = toRef(itemsStore.getThemeConf())
+
+/**
+ * 处理不同主题的样式
+ */
+let level = props.itemData.level
+const { themeconf } = storeToRefs(itemsStore)
+const { handleStyle } = require('@/utils/handleStyle')
+const bgcStyle = computed(handleStyle(themeconf, level, 'backgroundColor'))
+const ftStyle = computed(handleStyle(themeconf, level, 'fontSize'))
+const ftColorStyle = computed(handleStyle(themeconf, level, 'color'))
 
 //先触发里层的也就是最里层的
 onMounted(() => {
@@ -183,8 +197,6 @@ onMounted(() => {
   border-radius: 4px;
   overflow: hidden;
   padding: 18px 12px;
-  background-color: v-bind('themeCof[props.itemData.level <= themeCof.maxDep ? props.itemData.level : themeCof.maxDep].backgroundColor');
-  font-size: v-bind('themeCof[props.itemData.level <= themeCof.maxDep ? props.itemData.level : themeCof.maxDep].fontSize');
 }
 
 .drag-item>.item:hover {

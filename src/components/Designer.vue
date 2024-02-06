@@ -1,5 +1,7 @@
 <template>
-    <div class="designer" ref="designer">
+    <div class="designer" ref="designer" :style="{
+        'background-color': themeconf.baseBackgroundColor,
+    }">
         <div class="selectMask" ref="selectMask" v-if="showSelectMask" :style="{
             width: maskRect.width + 'px',
             height: maskRect.height + 'px',
@@ -14,10 +16,12 @@
 
 
 <script setup>
-import { computed, nextTick, onBeforeMount, onMounted, provide, reactive, ref, toRef } from 'vue';
+import { computed, nextTick, onBeforeMount, onMounted, provide, reactive, ref, toRef, watch } from 'vue';
 import DragItem from '@/components/DragItem.vue';
 import { useItemsStore } from '@/store/index'
+import { storeToRefs } from 'pinia';
 const itemsStore = useItemsStore()
+const { themeconf } = storeToRefs(itemsStore)
 
 const node1 = itemsStore.createDragItem(null)
 const node2 = itemsStore.createDragItem(node1)

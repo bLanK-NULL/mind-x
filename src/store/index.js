@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, onMounted, h, computed, watch, onBeforeUpdate, reactive, toRef } from 'vue'
 const uuidv4 = require('uuid').v4;
-
+const lightTheme = require(`@/theme/default.js`)
+const darkTheme = require(`@/theme/dark.js`)
 
 // 你可以对 `defineStore()` 的返回值进行任意命名，但最好使用 store 的名字，同时以 `use` 开头且以 `Store` 结尾。(比如 `useUserStore`，`useCartStore`，`useProductStore`)
 // 第一个参数是你的应用中 Store 的唯一 ID。
@@ -45,14 +46,14 @@ export const useItemsStore = defineStore('items', () => {
                 // console.log('initialPosition', this.level, this.parent.rect.height, this.rect.height);
                 const len = this.parent.children.length
                 this.parent.children.forEach((item, idx) => {
-                    item.pos.top = (idx - (len - 1) / 2) * (item.rect.height + getThemeConf().verticalGap) - item.rect.height / 2 + item.parent.rect.height / 2
+                    item.pos.top = (idx - (len - 1) / 2) * (item.rect.height + themeconf.value.verticalGap) - item.rect.height / 2 + item.parent.rect.height / 2
                 })
-                this.pos.left = this.parent.rect.width + getThemeConf().horizonGap
+                this.pos.left = this.parent.rect.width + themeconf.value.horizonGap
                 // this.pos.top = (this.parent.rect.height - this.rect.height) / 2
             } else { // 新加的节点是根节点
                 const len = topItems.value.length
                 topItems.value.forEach((item, idx) => {
-                    item.pos.top = (idx - (len - 1) / 2) * (item.rect.height + getThemeConf().verticalGap) - item.rect.height / 2 + 10000
+                    item.pos.top = (idx - (len - 1) / 2) * (item.rect.height + themeconf.value.verticalGap) - item.rect.height / 2 + 10000
                 })
                 this.pos.left = 9800
             }
@@ -65,10 +66,10 @@ export const useItemsStore = defineStore('items', () => {
         }
         //删除当前节点
         del() {
-            if(this.parent) {
+            if (this.parent) {
                 const idx = this.parent.children.findIndex(item => item === this)
                 this.parent.children.splice(idx, 1)
-            }else {
+            } else {
                 const idx = topItems.value.findIndex(item => item === this)
                 topItems.value.splice(idx, 1)
             }
@@ -96,15 +97,17 @@ export const useItemsStore = defineStore('items', () => {
 
         return newDragItem
     }
-    const themename = ref('default')
-    function getThemeConf() {
-        const theme = require(`@/theme/${themename.value}.js`)
-        return theme
 
+    const themeconf = ref(lightTheme)
+    function setTheme(name) {
+        if (name === 'dark')
+            themeconf.value = darkTheme
+        else
+            themeconf.value = lightTheme
     }
     return {
-        themename,
-        getThemeConf,
+        themeconf,
+        setTheme,
         topItems,
         createDragItem
     }
