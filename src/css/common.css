@@ -2,3 +2,15 @@
     margin: 0;
     padding: 0;
 }
+
+/* 隐藏滚动条 */
+body::-webkit-scrollbar {
+    display: none;
+}
+
+body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}

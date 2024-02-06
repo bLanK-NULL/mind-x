@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=
+    , initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        div {
+            width: 20000px;
+            height: 20000px;
+            /* background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50"><path d="M50 0H0v50h50V0zm-1 1v48H1V1h48z" fill="black" fill-opacity="0.1"/></svg>'); */
+            background-image: url('data:image/svg+xml, <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><path d="M25 0 v50" stroke="black" stroke-opacity="0.1" stroke-dasharray="16,4" /><path d="M0 25 h50" stroke="black" stroke-opacity="0.1" stroke-dasharray="16,4" /></svg>');
+        }
+    </style>
+</head>
+
+<body onload="">
+    <div>
+        <canvas id="canvas"></canvas>
+    </div>
+    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">
+        <path d="M50 0H0v50h50V0z m-1 1 v48H1V1h48z" fill="black" fill-opacity="0.1" />
+    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50">
+        <path d="M50 0H0v50h50V0z  " fill="white" stroke="black" fill-opacity="0.1" />
+    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><path d="M25 0 v50z M0 25 h50z"   stroke="black" stroke-opacity="0.1" stroke-dasharray="5,5" /></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><path d="M25 0 v50" stroke="black" stroke-dasharray="16,4" /><path d="M0 25 h50" stroke="black" stroke-dasharray="16,4" /></svg>
+</body>
+<script>
+    let len = 20000;
+    function draw() {
+        var canvas = document.getElementById("canvas");
+        if (canvas.getContext) {
+            var ctx = canvas.getContext("2d");
+            canvas.width = len;
+            canvas.height = len;
+            ctx.strokeStyle = "gray";
+            ctx.lineWidth = 1
+            ctx.setLineDash([15, 5])
+            for (let x = 0; x < len; x += 50) {
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, len);
+                // ctx.stroke();
+            }
+            for (let y = 0; y < len; y += 50) {
+                ctx.moveTo(0, y);
+                ctx.lineTo(len, y);
+                // ctx.stroke();
+            }
+            ctx.stroke()
+        }
+    }
+</script>
+
+</html>

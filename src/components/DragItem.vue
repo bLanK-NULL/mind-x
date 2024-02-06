@@ -3,7 +3,7 @@
   <div class="drag-item" ref="dragItem"
     :style="{ left: props.itemData.pos.left + 'px', top: props.itemData.pos.top + 'px' }">
     <div class="item" :class="{ 'selected-item': isSelectedItem }"
-      :style="{ cursor: props.itemData.isMoving ? 'grabbing' : 'grab' }" @click="handleClickItem">
+      :style="{ cursor: props.itemData.isMoving ? 'grabbing' : 'default' }" @click="handleClickItem">
       <div class="content" :contenteditable="contenteditable" @dblclick="handleEditTitle" @blur="afterHandleEditTitle"
         @keyup.enter.ctrl="contenteditable = false" v-html="props.itemData.title">
       </div>
@@ -33,7 +33,6 @@
 </template>
 
 <script setup>
-import DragItem from '@/components/DragItem.vue'
 import { computed, nextTick, onMounted, reactive, ref, watchEffect, watch, onBeforeUpdate, toRef, inject } from 'vue';
 import { customSelect } from '@/utils/index.js'
 import { useItemsStore } from '@/store/index'
@@ -159,9 +158,9 @@ watch(() => props.tabNum, () => {
 /**
  * del键删除节点
  */
- onMounted(() => {
+onMounted(() => {
   function handleDel(e) {
-    if(e.key==='Delete' && isSelectedItem.value && dragItem.value) {
+    if (e.key === 'Delete' && isSelectedItem.value && dragItem.value) {
       props.itemData.del()
     }
   }

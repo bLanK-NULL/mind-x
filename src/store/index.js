@@ -54,7 +54,7 @@ export const useItemsStore = defineStore('items', () => {
                 topItems.value.forEach((item, idx) => {
                     item.pos.top = (idx - (len - 1) / 2) * (item.rect.height + getThemeConf().verticalGap) - item.rect.height / 2 + 10000
                 })
-                this.pos.left = 9900
+                this.pos.left = 9800
             }
             // 初始调用本方法时,parent.rect没数据
         }

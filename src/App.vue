@@ -7,21 +7,15 @@
         left: maskRect.left - designer.getBoundingClientRect().x + 'px',
         top: maskRect.top - designer.getBoundingClientRect().y + 'px',
       }"></div>
-      <DragItem :tabNum="tabNum" :selectNum="selectNum" :maskRect="maskRect" :showSelectMask="showSelectMask" :itemData="topItem"
-        :level=topItem.level v-for="topItem of itemsStore.topItems" :key="topItem.id">
+      <DragItem :tabNum="tabNum" :selectNum="selectNum" :maskRect="maskRect" :showSelectMask="showSelectMask"
+        :itemData="topItem" :level=topItem.level v-for="topItem of itemsStore.topItems" :key="topItem.id">
       </DragItem>
-      <!-- 顶级节点的连出去的svg必须在这里划 -->
-      <!-- <svg >
-      <g>
-        <line x1="0" y1="0" x2="60" y2="60" stroke="crimson" stroke-width="2" />
-      </g>
-    </svg> -->
     </div>
   </div>
 </template>
 
 <script setup>
-import { nextTick, onBeforeMount, onMounted, provide, reactive, ref, toRef } from 'vue';
+import { computed, nextTick, onBeforeMount, onMounted, provide, reactive, ref, toRef } from 'vue';
 import DragItem from './components/DragItem.vue';
 import { useItemsStore } from '@/store/index'
 const itemsStore = useItemsStore()
@@ -30,11 +24,12 @@ const node1 = itemsStore.createDragItem(null)
 const node2 = itemsStore.createDragItem(node1)
 const node3 = itemsStore.createDragItem(node1)
 console.log(itemsStore.topItems);
-
+const designerW = ref(20000)
+const designerH = ref(20000)
 onMounted(() => {
   console.log('app vue onmounted');
   nextTick(() => {
-    window.scrollTo(10000 - 0.5 * window.innerWidth, 10000 - 0.5 * window.innerHeight)
+    window.scrollTo(designerW.value / 2 - 0.5 * window.innerWidth, designerH.value / 2 - 0.5 * window.innerHeight)
   })
 })
 
@@ -92,14 +87,61 @@ function handleTab(e) {
 document.addEventListener('keydown', handleTab, false)
 
 
+/**
+ * 按住空格移动
+ */
+let isSpacePressed = false;
+function handleSpaceKeyDown(event) {
+  if (isSpacePressed) {
+    let scale = window.devicePixelRatio
+    console.log(event.movementX, event.movementY);
+    window.scrollTo(window.scrollX - event.movementX / scale, window.scrollY - event.movementY / scale);
+  }
+}
+window.addEventListener('keydown', function (e) {
+  if (e.code === 'Space') {
+    e.preventDefault()
+    isSpacePressed = true;
+    document.body.style.cursor = 'grab';
+    window.addEventListener('mousemove', handleSpaceKeyDown);
+  }
+});
+
+window.addEventListener('keyup', function (event) {
+  if (event.code === 'Space') {
+    isSpacePressed = false;
+    document.body.style.cursor = 'default';
+    window.removeEventListener('mousemove', handleSpaceKeyDown);
+  }
+});
+
+/**
+ * 保证缩放时,视口中心点始终在中心
+ */
+let scale = 1
+onMounted(() => {
+  scale = window.devicePixelRatio
+})
+window.addEventListener('resize', function (e) {
+  //新倍率是旧倍率的几倍
+  let scaleRatio = window.devicePixelRatio / scale
+  // 缩放后在中心的点的相对视口坐标
+  let centerX = (scaleRatio - 1) * window.innerWidth / 2
+  let centerY = (scaleRatio - 1) * window.innerHeight / 2
+  // 移动滚动条
+  window.scrollTo(window.scrollX + centerX, window.scrollY + centerY)
+  scale = window.devicePixelRatio
+})
 
 </script>
  
 <style scoped> .designer {
-   width: 20000px;
-   height: 20000px;
-   background: antiquewhite;
+   width: v-bind("designerW + 'px'");
+   height: v-bind('designerH + "px"');
+   /* background: antiquewhite; */
    position: relative;
+   background-image: url('./assets/bgGrid.svg');
+
  }
 
  svg {
