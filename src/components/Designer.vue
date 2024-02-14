@@ -3,8 +3,8 @@
         'background-color': themeconf.baseBackgroundColor,
     }">
         <div class="selectMask" ref="selectMask" v-if="showSelectMask" :style="{
-            width: maskRect.width + 'px',
-            height: maskRect.height + 'px',
+            width: maskRect.width /  scale + 'px',
+            height: maskRect.height / scale+ 'px',
             left: maskRect.left - designer.getBoundingClientRect().x + 'px',
             top: maskRect.top - designer.getBoundingClientRect().y + 'px',
         }"></div>
