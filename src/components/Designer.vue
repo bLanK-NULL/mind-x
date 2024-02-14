@@ -3,8 +3,8 @@
         'background-color': themeconf.baseBackgroundColor,
     }">
         <div class="selectMask" ref="selectMask" v-if="showSelectMask" :style="{
-            width: maskRect.width + 'px',
-            height: maskRect.height + 'px',
+            width: maskRect.width / (scale / originScale) + 'px',
+            height: maskRect.height / (scale / originScale) + 'px',
             left: maskRect.left - designer.getBoundingClientRect().x + 'px',
             top: maskRect.top - designer.getBoundingClientRect().y + 'px',
         }"></div>
@@ -121,8 +121,10 @@ window.addEventListener('keyup', function (event) {
  * 保证缩放时,视口中心点始终在中心
  */
 let scale = 1
+let originScale = 1;
 onMounted(() => {
-    scale = window.devicePixelRatio
+    scale = window.devicePixelRatio;
+    originScale = scale;
 })
 window.addEventListener('resize', function (e) {
     //新倍率是旧倍率的几倍
