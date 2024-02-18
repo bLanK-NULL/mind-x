@@ -14,7 +14,7 @@
     </div>
     <!-- 子节点 -->
     <div class="children">
-      <DragItem :tabNum="tabNum" :selectNum="selectNum" :maskRect="maskRect" :showSelectMask="showSelectMask"
+      <DragItem :tabNum="tabNum" :maskRect="maskRect" :showSelectMask="showSelectMask"
         :itemData="topItem" :level="topItem.level" v-for=" topItem  of  props.itemData.children " :key="topItem.id">
       </DragItem>
     </div>
@@ -59,10 +59,6 @@ const props = defineProps({
   showSelectMask: {
     type: Boolean
   },
-  selectNum: {
-    type: Number,
-    default: 0
-  },
   tabNum: {
     type: Number,
     default: 0
@@ -75,42 +71,42 @@ const dragItem = ref(null)
  * 处理不同主题的样式
  */
 let level = props.itemData.level
-const { themeconf } = storeToRefs(itemsStore)
+const { themeconf, scaleRatio } = storeToRefs(itemsStore)
 const { handleStyle } = require('@/utils/handleStyle')
 const bgcStyle = computed(handleStyle(themeconf, level, 'backgroundColor'))
 const ftStyle = computed(handleStyle(themeconf, level, 'fontSize'))
 const ftColorStyle = computed(handleStyle(themeconf, level, 'color'))
 
-//先触发里层的也就是最里层的
+/**
+ * 绑定node
+ */
+onMounted(() => props.itemData.mount(dragItem.value))
+
+/**
+ * 移动item 的逻辑
+ */
 onMounted(() => {
-  //绑定node
-  props.itemData.mount(dragItem.value)
-
-  //移动逻辑 
-  let x, y, domX, domY;
-  const handleMousedown = function (e) {
-    x = e.clientX;
-    y = e.clientY;
-    domX = props.itemData.pos.left;
-    domY = props.itemData.pos.top;
-    e.stopPropagation()
-    props.itemData.isMoving = true;
-    document.addEventListener('mousemove', handleMouseMove, false)
-    this.addEventListener('mouseup', handleMouseUp, false)
-  }
-  const handleMouseMove = function (e) {
-    if (props.itemData.isMoving) {
-      props.itemData.pos.left = domX + e.clientX - x
-      props.itemData.pos.top = domY + e.clientY - y
-    }
-  }
-  const handleMouseUp = function (e) {
-    props.itemData.isMoving = false
-  }
-  //给dragItem 下的item 绑定事件， 但是移动的是整个dragItem
-  props.itemData.node.firstElementChild.addEventListener('mousedown', handleMousedown, false)
-
+  //给dragItem 下的item 绑定事件，  因为dragItem里有svg线段和子节点,不能在其上注册事件
+  dragItem.value.firstElementChild.addEventListener('mousedown', handleMousedown, false)
 })
+const handleMousedown = function (e) {
+  e.stopPropagation()
+  props.itemData.isMoving = true;
+  window.addEventListener('mousemove', handleMouseMove, false)
+  window.addEventListener('mouseup', handleMouseUp, false)
+}
+const handleMouseMove = function (e) {
+  if (props.itemData.isMoving) {
+    props.itemData.pos.left += e.movementX / scaleRatio.value
+    props.itemData.pos.top += e.movementY / scaleRatio.value
+  }
+}
+const handleMouseUp = function (e) {
+  props.itemData.isMoving = false;
+  window.removeEventListener('mousemove', handleMouseMove, false)
+  window.removeEventListener('mouseup', handleMouseUp, false)
+}
+
 
 /**
  * dblclick事件 修改title 的函数
@@ -145,8 +141,8 @@ function handleClickItem() {
 //框选
 onMounted(() => {
   //被框中的条件
-  watch(() => props.selectNum, () => {
-    // console.log(props.maskRect.width)
+  watch(() => props.showSelectMask, (newVal) => {
+    if (newVal) return;
     const dragItemRect = {
       width: props.itemData.node.getBoundingClientRect().width,
       height: props.itemData.node.getBoundingClientRect().height,

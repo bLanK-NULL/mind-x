@@ -3,13 +3,13 @@
         'background-color': themeconf.baseBackgroundColor,
     }">
         <div class="selectMask" ref="selectMask" v-if="showSelectMask" :style="{
-            width: maskRect.width / scaleRatio+ 'px',
-            height: maskRect.height /scaleRatio + 'px',
+            width: maskRect.width / scaleRatio + 'px',
+            height: maskRect.height / scaleRatio + 'px',
             left: maskRect.leftAbs + 'px',
             top: maskRect.topAbs + 'px',
         }"></div>
-        <DragItem :tabNum="tabNum" :selectNum="selectNum" :maskRect="maskRect" :showSelectMask="showSelectMask"
-            :itemData="topItem" :level=topItem.level v-for="topItem of itemsStore.topItems" :key="topItem.id">
+        <DragItem :tabNum="tabNum" :maskRect="maskRect" :showSelectMask="showSelectMask" :itemData="topItem"
+            :level=topItem.level v-for="topItem of itemsStore.topItems" :key="topItem.id">
         </DragItem>
         <Teleport to="body">
             <Transition name="showRatio">
@@ -34,11 +34,22 @@ const node3 = itemsStore.createDragItem(node1)
 console.log(itemsStore.topItems);
 const designerW = ref(20000)
 const designerH = ref(20000)
+/**
+ * 初始化画布位置
+ */
+// window.onload = function () {
+//     console.log(designerW.value / 2 - 0.5 * window.innerWidth, designerH.value / 2 - 0.5 * window.innerHeight)
+//     window.scrollTo(designerW.value / 2 - 0.5 * window.innerWidth, designerH.value / 2 - 0.5 * window.innerHeight)
+// }
 onMounted(() => {
     console.log('app vue onmounted');
-    nextTick(() => {
-        window.scrollTo(designerW.value / 2 - 0.5 * window.innerWidth, designerH.value / 2 - 0.5 * window.innerHeight)
-    })
+    // nextTick(() => {
+    // 取消浏览器默认的滚动恢复功能。
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(designerW.value / 2 - 0.5 * window.innerWidth, designerH.value / 2 - 0.5 * window.innerHeight)
+    // })
 })
 
 //框选
@@ -53,7 +64,6 @@ const maskRect = reactive({
 })
 const selectMask = ref(null)
 const designer = ref(null)
-const selectNum = ref(0) // 第几次框选，唯一标识一次框选
 onMounted(() => {
     designer.value.addEventListener('mousedown', (e) => {
         //点击相对于视口的坐标
@@ -67,20 +77,20 @@ onMounted(() => {
         function handleMousemove(e) {
             showSelectMask.value = true
             //随着缩放倍率而变化宽高
-            maskRect.width += e.movementX 
+            maskRect.width += e.movementX
             maskRect.height += e.movementY
         }
         designer.value.addEventListener('mouseup', handleMouseUpOrLeave)
         designer.value.addEventListener('mouseleave', handleMouseUpOrLeave)
         function handleMouseUpOrLeave(e) {
-            console.log(maskRect.width, maskRect.height) 
             designer.value.removeEventListener('mousemove', handleMousemove)
             showSelectMask.value = false
             nextTick(() => {
                 maskRect.width = 0;
                 maskRect.height = 0;
             })
-            selectNum.value++
+            designer.value.removeEventListener('mouseup', handleMouseUpOrLeave)
+            designer.value.removeEventListener('mouseleave', handleMouseUpOrLeave)
         }
     })
 })
