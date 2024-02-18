@@ -105,11 +105,14 @@ export const useItemsStore = defineStore('items', () => {
         else
             themeconf.value = lightTheme
     }
+
+    const scaleRatio = ref(1)
     return {
         themeconf,
         setTheme,
         topItems,
-        createDragItem
+        createDragItem,
+        scaleRatio
     }
 
 })

@@ -3,8 +3,6 @@
         'background-color': themeconf.baseBackgroundColor,
     }">
         <div class="selectMask" ref="selectMask" v-if="showSelectMask" :style="{
-
-
             width: maskRect.width / (scale / originScale) + 'px',
             height: maskRect.height / (scale / originScale) + 'px',
             left: maskRect.left - designer.getBoundingClientRect().x + 'px',
@@ -13,6 +11,11 @@
         <DragItem :tabNum="tabNum" :selectNum="selectNum" :maskRect="maskRect" :showSelectMask="showSelectMask"
             :itemData="topItem" :level=topItem.level v-for="topItem of itemsStore.topItems" :key="topItem.id">
         </DragItem>
+        <Teleport to="body">
+            <Transition name="showRatio">
+                <div class="showRatio" v-show="showScale">X {{ scaleRatio }}</div>
+            </Transition>
+        </Teleport>
     </div>
 </template>
 
@@ -23,7 +26,7 @@ import DragItem from '@/components/DragItem.vue';
 import { useItemsStore } from '@/store/index'
 import { storeToRefs } from 'pinia';
 const itemsStore = useItemsStore()
-const { themeconf } = storeToRefs(itemsStore)
+const { themeconf, scaleRatio } = storeToRefs(itemsStore)
 
 const node1 = itemsStore.createDragItem(null)
 const node2 = itemsStore.createDragItem(node1)
@@ -120,24 +123,38 @@ window.addEventListener('keyup', function (event) {
 });
 
 /**
- * 保证缩放时,视口中心点始终在中心
+ * scale 缩放的方式
  */
-let scale = 1
-let originScale = 1;
-onMounted(() => {
-    scale = window.devicePixelRatio;
-    originScale = scale;
-})
-window.addEventListener('resize', function (e) {
-    //新倍率是旧倍率的几倍
-    let scaleRatio = window.devicePixelRatio / scale
-    // 缩放后在中心的点的相对视口坐标
-    let centerX = (scaleRatio - 1) * window.innerWidth / 2
-    let centerY = (scaleRatio - 1) * window.innerHeight / 2
-    // 移动滚动条
-    window.scrollTo(window.scrollX + centerX, window.scrollY + centerY)
-    scale = window.devicePixelRatio
-})
+const showScale = ref(false)
+let timerOfScale = null;
+window.addEventListener('wheel', function (e) {
+    if (!e.ctrlKey) return
+    e.preventDefault();
+    let oldScale = scaleRatio.value;
+    if (e.deltaY < 0 && scaleRatio.value < 2) {
+        scaleRatio.value = Number((scaleRatio.value + 0.1).toFixed(1))
+    }
+    else if (e.deltaY > 0 && scaleRatio.value > 0.5) {
+        scaleRatio.value = Number((scaleRatio.value - 0.1).toFixed(1))
+    } else
+        return;
+    designer.value.style.scale = scaleRatio.value;
+    keepCenter(scaleRatio.value, oldScale)
+    //有效缩放后 显示当前倍率
+    showScale.value = true;
+    clearTimeout(timerOfScale)
+    timerOfScale = setTimeout(() => {
+        showScale.value = false
+        timerOfScale = null;
+    }, 1000)
+}, { passive: false })
+function keepCenter(newScale, oldScale = 1) {
+    const width = designer.value.clientWidth;
+    const height = designer.value.clientHeight;
+    const { scrollX, scrollY } = window
+    // console.log("移动: ", scrollX + width / 2 * (newScale - oldScale), scrollY + height / 2 * (newScale - oldScale))
+    window.scrollTo(scrollX + width / 2 * (newScale - oldScale), scrollY + height / 2 * (newScale - oldScale))
+}
 
 </script>
  
@@ -147,7 +164,7 @@ window.addEventListener('resize', function (e) {
      /* background: antiquewhite; */
      position: relative;
      background-image: url('@/assets/bgGrid.svg');
-
+     transform-origin: 0 0;
  }
 
  .selectMask {
@@ -156,5 +173,32 @@ window.addEventListener('resize', function (e) {
      background-color: rgba(120, 213, 250, 0.3);
      position: absolute;
      z-index: 999999999 !important;
+ }
+
+ .showRatio {
+     position: fixed;
+     bottom: 32px;
+     left: 20px;
+     background-color: rgba(255, 255, 255, .3);
+     border: 1px solid #000;
+     border-radius: 50%;
+     width: 40px;
+     height: 40px;
+     box-sizing: border-bo x;
+     text-align: center;
+     line-height: 40px;
+     font-size: 14px;
+     user-select: none;
+ }
+
+ /* vue 动画 */
+ .showRatio-enter-active,
+ .showRatio-leave-active {
+     transition: opacity 1s;
+ }
+
+ .showRatio-enter-from,
+ .showRatio-leave-to {
+     opacity: 0;
  }
 </style>
