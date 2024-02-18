@@ -3,10 +3,10 @@
         'background-color': themeconf.baseBackgroundColor,
     }">
         <div class="selectMask" ref="selectMask" v-if="showSelectMask" :style="{
-            width: maskRect.width / (scale / originScale) + 'px',
-            height: maskRect.height / (scale / originScale) + 'px',
-            left: maskRect.left - designer.getBoundingClientRect().x + 'px',
-            top: maskRect.top - designer.getBoundingClientRect().y + 'px',
+            width: maskRect.width / scaleRatio+ 'px',
+            height: maskRect.height /scaleRatio + 'px',
+            left: maskRect.leftAbs + 'px',
+            top: maskRect.topAbs + 'px',
         }"></div>
         <DragItem :tabNum="tabNum" :selectNum="selectNum" :maskRect="maskRect" :showSelectMask="showSelectMask"
             :itemData="topItem" :level=topItem.level v-for="topItem of itemsStore.topItems" :key="topItem.id">
@@ -48,25 +48,32 @@ const maskRect = reactive({
     height: 0,
     left: 0, //相对视口的坐标
     top: 0,
+    leftAbs: 0, //相对于designer的坐标
+    topAbs: 0,
 })
 const selectMask = ref(null)
 const designer = ref(null)
 const selectNum = ref(0) // 第几次框选，唯一标识一次框选
 onMounted(() => {
     designer.value.addEventListener('mousedown', (e) => {
-        //点击相对于视口的坐标 - designer相对于视口的坐标
-        maskRect.left = e.clientX
-        maskRect.top = e.clientY
+        //点击相对于视口的坐标
+        maskRect.left = e.clientX;
+        maskRect.top = e.clientY;
+        //点击相对于designer的坐标
+        maskRect.leftAbs = e.pageX / scaleRatio.value;
+        maskRect.topAbs = e.pageY / scaleRatio.value;
 
         designer.value.addEventListener('mousemove', handleMousemove)
         function handleMousemove(e) {
             showSelectMask.value = true
-            maskRect.width += e.movementX
+            //随着缩放倍率而变化宽高
+            maskRect.width += e.movementX 
             maskRect.height += e.movementY
         }
         designer.value.addEventListener('mouseup', handleMouseUpOrLeave)
         designer.value.addEventListener('mouseleave', handleMouseUpOrLeave)
         function handleMouseUpOrLeave(e) {
+            console.log(maskRect.width, maskRect.height) 
             designer.value.removeEventListener('mousemove', handleMousemove)
             showSelectMask.value = false
             nextTick(() => {
@@ -162,7 +169,9 @@ function keepCenter(newScale, oldScale = 1) {
      width: v-bind("designerW + 'px'");
      height: v-bind('designerH + "px"');
      /* background: antiquewhite; */
-     position: relative;
+     position: absolute;
+     left: 0;
+     top: 0;
      background-image: url('@/assets/bgGrid.svg');
      transform-origin: 0 0;
  }
