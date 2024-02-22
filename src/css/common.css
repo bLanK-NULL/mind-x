@@ -14,3 +14,15 @@ body {
     overflow-x: hidden;
     overflow-y: hidden;
 }
+
+/* 清除ul 和 li的默认样式 */
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul li {
+    margin: 0;
+    padding: 0;
+}
