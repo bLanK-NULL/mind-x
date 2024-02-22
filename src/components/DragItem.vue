@@ -7,7 +7,9 @@
       'background-color': bgcStyle,
       'font-size': ftStyle,
       'color': ftColorStyle,
-    }" @click="handleClickItem">
+    }" @click="handleClickItem"
+    v-ctxmenu:[contextmenuListOnItem]
+    >
       <div class="content" :contenteditable="contenteditable" @dblclick="handleEditTitle" @blur="afterHandleEditTitle"
         @keyup.enter.ctrl="contenteditable = false" v-html="props.itemData.title">
       </div>
@@ -176,6 +178,20 @@ onMounted(() => {
   }
   document.addEventListener('keydown', handleDel, true)
 })
+
+/**
+ * 右键菜单 在item上触发时
+ */
+ const contextmenuListOnItem = [{
+    title: '编辑',
+    fn: ()=>console.log('编辑')	
+}, {
+    title: '删除',
+    fn: null
+}, {
+    title: '复制',
+    fn: null
+}]
 </script>
 
 <style  scoped>
