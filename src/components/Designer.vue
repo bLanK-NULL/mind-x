@@ -1,7 +1,7 @@
 <template>
     <div class="designer" ref="designer" :style="{
         'background-color': themeconf.baseBackgroundColor,
-    }" @contextmenu="handleContextmenuOnDesigner">
+    }" v-ctxmenu:[contextmenuListOnDesigner]>
         <div class="selectMask" ref="selectMask" v-if="showSelectMask" :style="{
             width: maskRect.width / scaleRatio + 'px',
             height: maskRect.height / scaleRatio + 'px',
@@ -16,8 +16,6 @@
                 <div class="showRatio" v-show="showScale">X {{ scaleRatio }}</div>
             </Transition>
         </Teleport>
-        <ContextMenu ref="ctxMenuRef" :el="designer" :pos="contextmenuPos" :list="contextmenuList">
-        </ContextMenu>
     </div>
 </template>
 
@@ -25,7 +23,6 @@
 <script setup>
 import { computed, nextTick, onBeforeMount, onMounted, provide, reactive, ref, toRef, watch } from 'vue';
 import DragItem from '@/components/DragItem.vue';
-import ContextMenu from './ContextMenu/ContextMenu.vue';
 import { useItemsStore } from '@/store/index'
 import { storeToRefs } from 'pinia';
 const itemsStore = useItemsStore()
@@ -179,32 +176,15 @@ function keepCenter(newScale, oldScale = 1) {
 /**
  * 右键菜单
  */
-//处理designer上的右键菜单
-const contextmenuPos = reactive({
-    left: 0,
-    top: 0
-})
 // binding.arg
-const contextmenuList = reactive([{
+const contextmenuListOnDesigner = [{
     title: 'default测试',
     fn: (e) => console.log('default fn', e),
 }, {
     title: '111',
     fn: null
-}])
-const ctxMenuRef = ref(null)
-//打开designer上的右键菜单
-function handleContextmenuOnDesigner(e) {
-    e.preventDefault()
-    ctxMenuRef.value.visible = true;
-    contextmenuPos.left = e.x;
-    contextmenuPos.top = e.y;
-}
-//处理item上的右键菜单
-function handleContextmenuOnItem(e) {
-    e.preventDefault()
-    e.stopPropagation()
-}
+}]
+
 </script>
  
 <style scoped> .designer {

@@ -1,26 +1,24 @@
 <template>
-    <div class="contextmenu" v-if="visible">
-        <div class="contextMask" @click="(e) => {
-            e.stopPropagation();
-            visible = false;
-        }"></div>
-        <div class="box">
-            <ul>
-                <li v-for="(item, index) of props.list"
-                    @click="($event) => { item.fn && item.fn($event); visible = false; }" :key="index">
-                    {{ item.title }}</li>
-            </ul>
+    <Teleport to="body">
+        <div class="contextmenu" v-if="props.isVisible.value">
+            <div class="contextMask" @click="(e) => {
+                e.stopPropagation();
+                $closeCtxmenu()
+            }"></div>
+            <div class="box">
+                <ul>
+                    <li v-for="(item, index) of props.list"
+                        @click="($event) => { item.fn && item.fn($event); $closeCtxmenu() }" :key="index">
+                        {{ item.title }}</li>
+                </ul>
+            </div>
         </div>
-    </div>
+    </Teleport>
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount, ref, onUnmounted } from 'vue';
+import { onMounted, onBeforeUnmount, ref, onUnmounted, toRaw } from 'vue';
 const props = defineProps({
-    el: {
-        type: Object,
-        default: null,
-    },
     pos: {
         type: Object,
         default: () => {
@@ -37,17 +35,26 @@ const props = defineProps({
         }
     },
     isVisible: {
-        type: Boolean,
-        default: false
+        type: Object,
+        default: ref(false)
     }
 })
-//尽管这个组件没有真实dom，但是组件实例从没被销毁
-const visible = ref(false);
 
-defineExpose({ visible })
 </script>
 
 <style lang="css" scoped>
+/* 清除ul 和 li的默认样式 */
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul li {
+    margin: 0;
+    padding: 0;
+}
+
 .contextMask {
     position: fixed;
     left: 0;
@@ -62,7 +69,7 @@ defineExpose({ visible })
     position: fixed;
     left: v-bind("props.pos.left + 5 + 'px'");
     top: v-bind("props.pos.top + 5 + 'px'");
-    z-index: 99999999999999!important;
+    z-index: 99999999999999 !important;
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #f9f9fb;
