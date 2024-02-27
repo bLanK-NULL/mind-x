@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, onMounted, h, computed, watch, onBeforeUpdate, reactive, toRef, toRaw } from 'vue'
+import { successMsg, errorMsg } from '@/hooks/Message/globalMessage'
 const uuidv4 = require('uuid').v4;
 const lightTheme = require(`@/theme/default.js`)
 const darkTheme = require(`@/theme/dark.js`)
@@ -90,6 +91,18 @@ export const useItemsStore = defineStore('items', () => {
                 next: [],
             }
         }
+        /**
+         * 导入 ---- 导入实例属性
+         *  不导入next; children， parent 已经处理好
+         * 
+         */
+        importProperties(ext) {
+            this.pos = reactive(ext.pos)
+            this.rect = reactive(ext.rect)
+            this.title = ext.title
+            this.id = ext.id
+            this.level = ext.level
+        }
     }
     //所有顶层节点， 一般是一个顶级节点，（以后可能拓展游离节点）
     const topItems = ref([])
@@ -125,7 +138,11 @@ export const useItemsStore = defineStore('items', () => {
     //导出所有节点的必要实例属性
     function extractProject() {
         const extract = traverseTopItems(topItems.value)
-        return JSON.stringify(extract)
+        return JSON.stringify({
+            extract,
+            themeName: themeconf.value.name,
+            scaleRatio: scaleRatio.value
+        })
     }
     function traverseTopItems(items) {
         if (!items || items.length === 0)
@@ -140,13 +157,61 @@ export const useItemsStore = defineStore('items', () => {
         }
         return extract
     }
+
+    // 导入本地保存的记录 -- return false 代表导入失败
+    function importProject() {
+        try {
+            const project = JSON.parse(localStorage.getItem('mind-x'))
+            setTheme(project.themeName)
+            scaleRatio.value = project.scaleRatio
+            // 导入所有节点的数据
+            topItems.value = traverseExtract(project.extract)
+            if (topItems.value.length === 0)
+                return false;
+        } catch (error) {
+            errorMsg('本地导入失败')
+            return false;
+        }
+        console.log('本地导入成功', toRaw(topItems.value))
+        successMsg('本地导入成功')
+        return true;
+    }
+    /** 
+     * @returns extract数据下还原的topItems:  DragItems[]
+     */
+    function traverseExtract(extract, parentItem = null) {
+        if (!extract || extract.length === 0)
+            return [];
+        const topItems = [];
+        for (let i = 0; i < extract.length; i++) {
+            let ext = extract[i];
+            const dragItem = createDragItem(parentItem) // 处理好了 dragItem.parent
+            const children = traverseExtract(ext.next, dragItem)
+            dragItem.children = children; // 处理好了 dragItem.children
+            topItems.push(dragItem);
+        }
+        return topItems
+    }
+
+
+    //如果不导入，则自动初始化三个初始节点
+    function initProject() {
+        const isSuccess = importProject()
+        if (!isSuccess) {
+            console.log('自动初始化3个节点')
+            const node1 = createDragItem(null)
+            createDragItem(node1)
+            createDragItem(node1)
+        }
+    }
     return {
         themeconf,
         setTheme,
         topItems,
         createDragItem,
         scaleRatio,
-        extractProject
+        extractProject,
+        initProject
     }
 
 })

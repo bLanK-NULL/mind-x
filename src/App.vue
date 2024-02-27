@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-import { ref, h, computed, onMounted } from 'vue';
+import { ref, h, computed, onMounted, toRaw } from 'vue';
 import Designer from '@/components/Designer.vue';
 import TopTools from '@/components/TopTools.vue';
 import { useItemsStore } from '@/store/index'
@@ -22,7 +22,10 @@ import { defineComponent } from 'vue';
 import { storeToRefs } from 'pinia';
 const itemstore = useItemsStore()
 const { themeconf, topItems } = storeToRefs(itemstore)
-const { setTheme, extractProject } = itemstore
+const { setTheme, createDragItem,initProject } = itemstore
+
+//初始化 导入本地||生成3个初始节点
+initProject()
 
 //白天模式和黑夜模式的图标
 const MyIcon = createFromIconfontCN({

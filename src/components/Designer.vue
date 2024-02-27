@@ -9,7 +9,7 @@
             top: maskRect.topAbs + 'px',
         }"></div>
         <DragItem :tabNum="tabNum" :maskRect="maskRect" :showSelectMask="showSelectMask" :itemData="topItem"
-            :level=topItem.level v-for="topItem of itemsStore.topItems" :key="topItem.id">
+            :level=topItem.level v-for="topItem of topItems" :key="topItem.id">
         </DragItem>
         <Teleport to="body">
             <Transition name="showRatio">
@@ -29,20 +29,12 @@ import { successMsg ,errorMsg } from '@/hooks/Message/globalMessage'
 const itemsStore = useItemsStore()
 const { themeconf, scaleRatio, topItems } = storeToRefs(itemsStore)
 const { extractProject } = itemsStore
+const designerW = 20000
+const designerH = 20000
 
-const node1 = itemsStore.createDragItem(null)
-const node2 = itemsStore.createDragItem(node1)
-const node3 = itemsStore.createDragItem(node1)
-console.log(toRaw(topItems.value));
-const designerW = ref(20000)
-const designerH = ref(20000)
 /**
  * 初始化画布位置
- */
-// window.onload = function () {
-//     console.log(designerW.value / 2 - 0.5 * window.innerWidth, designerH.value / 2 - 0.5 * window.innerHeight)
-//     window.scrollTo(designerW.value / 2 - 0.5 * window.innerWidth, designerH.value / 2 - 0.5 * window.innerHeight)
-// }
+ */ 
 onMounted(() => {
     console.log('app vue onmounted');
     // nextTick(() => {
@@ -50,7 +42,7 @@ onMounted(() => {
     if ('scrollRestoration' in history) {
         history.scrollRestoration = 'manual';
     }
-    window.scrollTo(designerW.value / 2 - 0.5 * window.innerWidth, designerH.value / 2 - 0.5 * window.innerHeight)
+    window.scrollTo(designerW / 2 - 0.5 * window.innerWidth, designerH / 2 - 0.5 * window.innerHeight)
     // })
 })
 
