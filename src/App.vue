@@ -20,6 +20,9 @@ import AFloatButton from 'ant-design-vue/es/float-button';
 import { createFromIconfontCN } from '@ant-design/icons-vue';
 import { defineComponent } from 'vue';
 import { storeToRefs } from 'pinia';
+const itemstore = useItemsStore()
+const { themeconf, topItems } = storeToRefs(itemstore)
+const { setTheme, extractProject } = itemstore
 
 //白天模式和黑夜模式的图标
 const MyIcon = createFromIconfontCN({
@@ -32,9 +35,6 @@ const MyIconComp = defineComponent({
 
 });
 //切换主题
-const itemstore = useItemsStore()
-const { themeconf } = storeToRefs(itemstore)
-const { setTheme } = itemstore
 
 const isDarkMode = ref(false)
 const modeName = computed(() => {

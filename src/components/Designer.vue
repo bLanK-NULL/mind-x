@@ -21,17 +21,19 @@
 
 
 <script setup>
-import { computed, nextTick, onBeforeMount, onMounted, provide, reactive, ref, toRef, watch } from 'vue';
+import { computed, nextTick, onBeforeMount, onMounted, provide, reactive, ref, toRef, watch, toRaw, getCurrentInstance } from 'vue';
 import DragItem from '@/components/DragItem.vue';
 import { useItemsStore } from '@/store/index'
 import { storeToRefs } from 'pinia';
+import { successMsg ,errorMsg } from '@/hooks/Message/globalMessage'
 const itemsStore = useItemsStore()
-const { themeconf, scaleRatio } = storeToRefs(itemsStore)
+const { themeconf, scaleRatio, topItems } = storeToRefs(itemsStore)
+const { extractProject } = itemsStore
 
 const node1 = itemsStore.createDragItem(null)
 const node2 = itemsStore.createDragItem(node1)
 const node3 = itemsStore.createDragItem(node1)
-console.log(itemsStore.topItems);
+console.log(toRaw(topItems.value));
 const designerW = ref(20000)
 const designerH = ref(20000)
 /**
@@ -178,8 +180,16 @@ function keepCenter(newScale, oldScale = 1) {
  */
 // binding.arg
 const contextmenuListOnDesigner = [{
-    title: 'default测试',
-    fn: (e) => console.log('default fn', e),
+    title: '保存',
+    fn: (e) => {
+        const waitingToSaveJson = extractProject();
+        localStorage.setItem('mind-x', waitingToSaveJson);
+        if (localStorage.getItem('mind-x') === waitingToSaveJson) {
+            successMsg('保存到本地成功')
+        } else {
+            errorMsg('保存失败')
+        }
+    }
 }, {
     title: '111',
     fn: null

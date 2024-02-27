@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, onMounted, h, computed, watch, onBeforeUpdate, reactive, toRef } from 'vue'
+import { ref, onMounted, h, computed, watch, onBeforeUpdate, reactive, toRef, toRaw } from 'vue'
 const uuidv4 = require('uuid').v4;
 const lightTheme = require(`@/theme/default.js`)
 const darkTheme = require(`@/theme/dark.js`)
@@ -76,6 +76,20 @@ export const useItemsStore = defineStore('items', () => {
             //调整剩余节点位置
             this.InitialPosition()
         }
+        /**
+         * 导出----提取实例属性
+         * isMoving parent children node 不导出
+         *  */
+        extractProperties() {
+            return {
+                pos: toRaw(this.pos),
+                rect: toRaw(this.rect),
+                title: this.title,
+                id: this.id,
+                level: this.level,
+                next: [],
+            }
+        }
     }
     //所有顶层节点， 一般是一个顶级节点，（以后可能拓展游离节点）
     const topItems = ref([])
@@ -97,7 +111,7 @@ export const useItemsStore = defineStore('items', () => {
 
         return newDragItem
     }
-
+    //当前主题
     const themeconf = ref(lightTheme)
     function setTheme(name) {
         if (name === 'dark')
@@ -105,14 +119,34 @@ export const useItemsStore = defineStore('items', () => {
         else
             themeconf.value = lightTheme
     }
-
+    //缩放倍率
     const scaleRatio = ref(1)
+
+    //导出所有节点的必要实例属性
+    function extractProject() {
+        const extract = traverseTopItems(topItems.value)
+        return JSON.stringify(extract)
+    }
+    function traverseTopItems(items) {
+        if (!items || items.length === 0)
+            return [];
+        const extract = [];
+        for (let i = 0; i < items.length; i++) {
+            let item = items[i]
+            // console.log(item.id.slice(0, 4))
+            const extItemProp = item.extractProperties()
+            extract.push(extItemProp)
+            extItemProp.next = traverseTopItems(item.children)
+        }
+        return extract
+    }
     return {
         themeconf,
         setTheme,
         topItems,
         createDragItem,
-        scaleRatio
+        scaleRatio,
+        extractProject
     }
 
 })
