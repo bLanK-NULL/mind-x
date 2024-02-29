@@ -151,7 +151,6 @@ window.addEventListener('wheel', function (e) {
 }, { passive: false })
 onMounted(() => {
     watch(scaleRatio, (newVal, oldVal) => {
-        console.log('scaleRatio', newVal, oldVal)
         designer.value.style.scale = newVal;
         keepCenter(newVal, oldVal)
         //有效缩放后 显示当前倍率
