@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, onMounted, h, computed, watch, onBeforeUpdate, reactive, toRef, toRaw } from 'vue'
+import { ref, onMounted, h, computed, watch, onBeforeUpdate, reactive, toRef, toRaw, onBeforeMount } from 'vue'
 import { successMsg, errorMsg } from '@/hooks/Message/globalMessage'
 const uuidv4 = require('uuid').v4;
 const lightTheme = require(`@/theme/default.js`)
@@ -163,7 +163,6 @@ export const useItemsStore = defineStore('items', () => {
         try {
             const project = JSON.parse(localStorage.getItem('mind-x'))
             setTheme(project.themeName)
-            scaleRatio.value = project.scaleRatio
             // 导入所有节点的数据
             topItems.value = traverseExtract(project.extract)
             if (topItems.value.length === 0)
@@ -172,7 +171,7 @@ export const useItemsStore = defineStore('items', () => {
             errorMsg('本地导入失败')
             return false;
         }
-        console.log('本地导入成功', toRaw(topItems.value))
+        // console.log('本地导入成功', toRaw(topItems.value))
         successMsg('本地导入成功')
         return true;
     }
