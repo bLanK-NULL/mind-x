@@ -28,21 +28,19 @@ import { storeToRefs } from 'pinia';
 import { successMsg, errorMsg } from '@/hooks/Message/globalMessage'
 const itemsStore = useItemsStore()
 const { themeconf, scaleRatio, topItems } = storeToRefs(itemsStore)
-const { extractProject } = itemsStore
-const designerW = 20000
-const designerH = 20000
+const { extractProject, initialViewportPos, designerRect } = itemsStore
 
 /**
  * 初始化画布位置
  */
 onMounted(() => {
-    console.log('app vue onmounted');
+    console.log('designer vue onmounted');
     // nextTick(() => {
     // 取消浏览器默认的滚动恢复功能。
     if ('scrollRestoration' in history) {
         history.scrollRestoration = 'manual';
     }
-    window.scrollTo(designerW / 2 - 0.5 * window.innerWidth, designerH / 2 - 0.5 * window.innerHeight)
+    nextTick(() => window.scrollTo(initialViewportPos.x, initialViewportPos.y))
     // })
 })
 
@@ -98,7 +96,7 @@ function handleTab(e) {
     if (e.key === 'Tab') {
         e.preventDefault()
         e.stopPropagation()
-        console.log('Tab');
+        // console.log('Tab');
         tabNum.value++;
         return false;
     }
@@ -193,8 +191,8 @@ const contextmenuListOnDesigner = [{
 </script>
  
 <style scoped> .designer {
-     width: v-bind("designerW + 'px'");
-     height: v-bind('designerH + "px"');
+     width: v-bind("designerRect.width + 'px'");
+     height: v-bind('designerRect.height + "px"');
      /* background: antiquewhite; */
      position: absolute;
      left: 0;

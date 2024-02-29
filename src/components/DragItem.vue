@@ -7,17 +7,15 @@
       'background-color': bgcStyle,
       'font-size': ftStyle,
       'color': ftColorStyle,
-    }" @click="handleClickItem"
-    v-ctxmenu:[contextmenuListOnItem]
-    >
+    }" @click="handleClickItem" v-ctxmenu:[contextmenuListOnItem]>
       <div class="content" :contenteditable="contenteditable" @dblclick="handleEditTitle" @blur="afterHandleEditTitle"
         @keyup.enter.ctrl="contenteditable = false" v-html="props.itemData.title">
       </div>
     </div>
     <!-- 子节点 -->
     <div class="children">
-      <DragItem :tabNum="tabNum" :maskRect="maskRect" :showSelectMask="showSelectMask"
-        :itemData="topItem" :level="topItem.level" v-for=" topItem  of  props.itemData.children " :key="topItem.id">
+      <DragItem :tabNum="tabNum" :maskRect="maskRect" :showSelectMask="showSelectMask" :itemData="topItem"
+        :level="topItem.level" v-for=" topItem  of  props.itemData.children " :key="topItem.id">
       </DragItem>
     </div>
     <!-- 起点节点保存连线 -->
@@ -182,15 +180,15 @@ onMounted(() => {
 /**
  * 右键菜单 在item上触发时
  */
- const contextmenuListOnItem = [{
-    title: '编辑',
-    fn: ()=>console.log('编辑')	
+const contextmenuListOnItem = [{
+  title: '编辑',
+  fn: () => console.log('编辑')
 }, {
-    title: '删除',
-    fn: null
+  title: '删除',
+  fn: null
 }, {
-    title: '复制',
-    fn: null
+  title: '复制',
+  fn: null
 }]
 </script>
 
