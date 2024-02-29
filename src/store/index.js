@@ -163,6 +163,7 @@ export const useItemsStore = defineStore('items', () => {
         try {
             const project = JSON.parse(localStorage.getItem('mind-x'))
             setTheme(project.themeName)
+            scaleRatio.value = project.scaleRatio
             // 导入所有节点的数据
             topItems.value = traverseExtract(project.extract)
             if (topItems.value.length === 0)

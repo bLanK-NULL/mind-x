@@ -25,7 +25,7 @@ import { computed, nextTick, onBeforeMount, onMounted, provide, reactive, ref, t
 import DragItem from '@/components/DragItem.vue';
 import { useItemsStore } from '@/store/index'
 import { storeToRefs } from 'pinia';
-import { successMsg ,errorMsg } from '@/hooks/Message/globalMessage'
+import { successMsg, errorMsg } from '@/hooks/Message/globalMessage'
 const itemsStore = useItemsStore()
 const { themeconf, scaleRatio, topItems } = storeToRefs(itemsStore)
 const { extractProject } = itemsStore
@@ -34,7 +34,7 @@ const designerH = 20000
 
 /**
  * 初始化画布位置
- */ 
+ */
 onMounted(() => {
     console.log('app vue onmounted');
     // nextTick(() => {
@@ -141,7 +141,6 @@ let timerOfScale = null;
 window.addEventListener('wheel', function (e) {
     if (!e.ctrlKey) return
     e.preventDefault();
-    let oldScale = scaleRatio.value;
     if (e.deltaY < 0 && scaleRatio.value < 2) {
         scaleRatio.value = Number((scaleRatio.value + 0.1).toFixed(1))
     }
@@ -149,16 +148,21 @@ window.addEventListener('wheel', function (e) {
         scaleRatio.value = Number((scaleRatio.value - 0.1).toFixed(1))
     } else
         return;
-    designer.value.style.scale = scaleRatio.value;
-    keepCenter(scaleRatio.value, oldScale)
-    //有效缩放后 显示当前倍率
-    showScale.value = true;
-    clearTimeout(timerOfScale)
-    timerOfScale = setTimeout(() => {
-        showScale.value = false
-        timerOfScale = null;
-    }, 1000)
 }, { passive: false })
+onMounted(() => {
+    watch(scaleRatio, (newVal, oldVal) => {
+        console.log('scaleRatio', newVal, oldVal)
+        designer.value.style.scale = newVal;
+        keepCenter(newVal, oldVal)
+        //有效缩放后 显示当前倍率
+        showScale.value = true;
+        clearTimeout(timerOfScale)
+        timerOfScale = setTimeout(() => {
+            showScale.value = false
+            timerOfScale = null;
+        }, 1000)
+    }, { immediate: true })
+})
 function keepCenter(newScale, oldScale = 1) {
     const width = designer.value.clientWidth;
     const height = designer.value.clientHeight;
