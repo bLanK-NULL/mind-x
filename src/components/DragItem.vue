@@ -169,9 +169,7 @@ watch(() => props.tabNum, () => {
     } else { // 没有兄弟，就对其父节点
       newDragItem.pos.left = props.itemData.rect.width + themeconf.value.horizonGap;
       newDragItem.pos.top = - newDragItem.rect.height / 2 + newDragItem.rect.height / 2;
-      console.log('tab', toRaw(newDragItem.rect))
     }
-
   }
 })
 

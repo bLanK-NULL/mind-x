@@ -179,7 +179,12 @@ const contextmenuListOnDesigner = [{
     title: '添加',
     fn: (e) => {
         const item = createDragItem(null)
-        console.log()
+        watch(item.rect, (newVal) => {
+            item.pos.left = (e.pageX - newVal.width/2) * scaleRatio.value;
+            item.pos.top = (e.pageY-newVal.height/2) * scaleRatio.value;
+        }, { once: true })
+
+        console.log(e)
     }
 }]
 function saveToLocal(e) {
