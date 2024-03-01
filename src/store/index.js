@@ -39,10 +39,9 @@ export const useItemsStore = defineStore('items', () => {
         }
         // 挂载到真实节点上的一系列操作
         mount(node) {
-            console.log('mounted',node)
+            // console.log('mounted',node)
             this.node = node;
-            this.rect.width = node.getBoundingClientRect().width;
-            this.rect.height = node.getBoundingClientRect().height;
+            this.updateRect();
             //tab加的节点走不了App节点的onMounted， 只能走这样里的。
             // 初创时：自己其他兄弟节点不一定挂载了，所以这里是没用的。其实是靠下面的InitialPosition
             // 修改时： 只有这里起到作用
@@ -50,19 +49,21 @@ export const useItemsStore = defineStore('items', () => {
             //自己所有孩子都标准化位置。 这样下面就可以不要InitialPosition了
             // console.log('parent', this.parent.node)
             //有真实父dom节点的情况只能是后来tab添加的节点; 初始创建的（初始三个 || 本地读取）此时还拿不到真实dom节点
-            if (this.parent && this.parent.node) {
-                this.parent.standardizeChildrenPos()
-            } else {
-                if (!this.isLocal) // 不是从本地读取来的。
-                    this.standardizeChildrenPos()
-                this.isLocal = false;
-            }
+            // if (this.parent && this.parent.node) {
+            //     this.parent.standardizeChildrenPos()
+            // } else {
+            //     if (!this.isLocal) // 不是从本地读取来的。
+            //         this.standardizeChildrenPos()
+            //     this.isLocal = false;
+            // }
         }
         //更新节点width和height的数据
         updateRect() {
-            if (this.node) {
-                this.mount(this.node)
-            }
+            // if (this.node) {
+            //     this.mount(this.node)
+            // }
+            this.rect.width = this.node.clientWidth;
+            this.rect.height = this.node.clientHeight;
         }
         //规范化所有子节点位置
         standardizeChildrenPos() {
@@ -254,9 +255,12 @@ export const useItemsStore = defineStore('items', () => {
         const isSuccess = importProject()
         if (!isSuccess) {
             console.log('自动初始化3个节点')
-            const node1 = createDragItem(null)
-            createDragItem(node1)
-            createDragItem(node1)
+            const root = createDragItem(null)
+            createDragItem(root)
+            createDragItem(root)
+            onMounted(() => {
+                root.standardizeChildrenPos();
+            })
         }
     }
     return {

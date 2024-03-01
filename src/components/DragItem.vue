@@ -15,7 +15,7 @@
     <!-- 子节点 -->
     <div class="children">
       <DragItem :tabNum="tabNum" :maskRect="maskRect" :showSelectMask="showSelectMask" :itemData="topItem"
-        :level="props.level+1" v-for=" topItem  of  props.itemData.children " :key="topItem.id">
+        :level="props.level + 1" v-for=" topItem  of  props.itemData.children " :key="topItem.id">
       </DragItem>
     </div>
     <!-- 起点节点保存连线 -->
@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, reactive, ref, watchEffect, watch, onBeforeUpdate, toRef, inject, onBeforeMount } from 'vue';
+import { computed, nextTick, onMounted, reactive, ref, watchEffect, watch, onBeforeUpdate, toRef, inject, onBeforeMount, toRaw } from 'vue';
 import { customSelect } from '@/utils/index.js'
 import { useItemsStore } from '@/store/index'
 import { storeToRefs } from 'pinia';
@@ -66,12 +66,11 @@ const props = defineProps({
 })
 const contenteditable = ref(false)
 const dragItem = ref(null)
-
+const { themeconf, scaleRatio } = storeToRefs(itemsStore)
 /**
  * 处理不同主题的样式
  */
 let level = props.level
-const { themeconf, scaleRatio } = storeToRefs(itemsStore)
 const { handleStyle } = require('@/utils/handleStyle')
 const bgcStyle = computed(handleStyle(themeconf, level, 'backgroundColor'))
 const ftStyle = computed(handleStyle(themeconf, level, 'fontSize'))
@@ -162,6 +161,17 @@ watch(() => props.tabNum, () => {
   if (isSelectedItem.value) {
     const newDragItem = itemsStore.createDragItem(props.itemData)
     isSelectedItem.value = false
+    //初始化位置---默认在上一个兄弟的正下方。
+    const lastSibling = props.itemData.children[props.itemData.children.length - 2];
+    if (lastSibling) {
+      newDragItem.pos.left = lastSibling.pos.left
+      newDragItem.pos.top = lastSibling.pos.top + lastSibling.rect.height + themeconf.value.verticalGap
+    } else { // 没有兄弟，就对其父节点
+      newDragItem.pos.left = props.itemData.rect.width + themeconf.value.horizonGap;
+      newDragItem.pos.top = - newDragItem.rect.height / 2 + newDragItem.rect.height / 2;
+      console.log('tab', toRaw(newDragItem.rect))
+    }
+
   }
 })
 
