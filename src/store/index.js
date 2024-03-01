@@ -79,7 +79,7 @@ export const useItemsStore = defineStore('items', () => {
                     this.pos.top = 9800;
                 } else {
                     this.pos.left = topItems.value[len - 2].pos.left;
-                    this.pos.top = topItems.value[len - 2].pos.top + themeconf.value.verticalGap;
+                    this.pos.top = topItems.value[len - 2].pos.top + topItems.value[len - 2].rect.height + themeconf.value.verticalGap;
                 }
             }
         }
@@ -102,7 +102,7 @@ export const useItemsStore = defineStore('items', () => {
             }
             // 初始调用本方法时,parent.rect没数据
         }
-        //删除当前节点
+        //删除当前节点 -- 子节点挂载到父节点上去
         del() {
             if (this.parent) {
                 const idx = this.parent.children.findIndex(item => item === this)

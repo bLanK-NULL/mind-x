@@ -28,7 +28,7 @@ import { storeToRefs } from 'pinia';
 import { successMsg, errorMsg } from '@/hooks/Message/globalMessage'
 const itemsStore = useItemsStore()
 const { themeconf, scaleRatio, topItems } = storeToRefs(itemsStore)
-const { extractProject, initialViewportPos, designerRect } = itemsStore
+const { extractProject, initialViewportPos, designerRect, createDragItem } = itemsStore
 
 /**
  * 初始化画布位置
@@ -184,8 +184,11 @@ const contextmenuListOnDesigner = [{
         }
     }
 }, {
-    title: '111',
-    fn: null
+    title: '添加',
+    fn: (e) => {
+        const item = createDragItem(null)
+        console.log()
+    }
 }]
 
 </script>
