@@ -8,8 +8,8 @@
             left: maskRect.leftAbs + 'px',
             top: maskRect.topAbs + 'px',
         }"></div>
-        <DragItem :tabNum="tabNum" :maskRect="maskRect" :showSelectMask="showSelectMask" :itemData="topItem"
-            :level=topItem.level v-for="topItem of topItems" :key="topItem.id">
+        <DragItem :tabNum="tabNum" :maskRect="maskRect" :showSelectMask="showSelectMask" :itemData="topItem" :level=0
+            v-for="topItem of topItems" :key="topItem.id">
         </DragItem>
         <Teleport to="body">
             <Transition name="showRatio">
@@ -174,15 +174,7 @@ function keepCenter(newScale, oldScale = 1) {
 // binding.arg
 const contextmenuListOnDesigner = [{
     title: '保存',
-    fn: (e) => {
-        const waitingToSaveJson = extractProject();
-        localStorage.setItem('mind-x', waitingToSaveJson);
-        if (localStorage.getItem('mind-x') === waitingToSaveJson) {
-            successMsg('保存到本地成功')
-        } else {
-            errorMsg('保存失败')
-        }
-    }
+    fn: saveToLocal
 }, {
     title: '添加',
     fn: (e) => {
@@ -190,7 +182,22 @@ const contextmenuListOnDesigner = [{
         console.log()
     }
 }]
-
+function saveToLocal(e) {
+    const waitingToSaveJson = extractProject();
+    localStorage.setItem('mind-x', waitingToSaveJson);
+    if (localStorage.getItem('mind-x') === waitingToSaveJson) {
+        successMsg('保存到本地成功')
+    } else {
+        errorMsg('保存失败')
+    }
+}
+//保存ctrl+s
+window.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.key === 's') {
+        e.preventDefault()
+        saveToLocal()
+    }
+})
 </script>
  
 <style scoped> .designer {

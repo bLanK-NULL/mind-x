@@ -34,11 +34,12 @@ export const useItemsStore = defineStore('items', () => {
             this.id = uuidv4()
             this.parent = parent || null //指向父亲地址
             this.children = []
-            this.level = this.parent ? this.parent.level + 1 : 0 // level = praent.level +1
+            // this.level = this.parent ? this.parent.level + 1 : 0 // level = praent.level +1
             this.node = null; //挂载的dragItem节点
         }
         // 挂载到真实节点上的一系列操作
         mount(node) {
+            console.log('mounted',node)
             this.node = node;
             this.rect.width = node.getBoundingClientRect().width;
             this.rect.height = node.getBoundingClientRect().height;
@@ -52,7 +53,6 @@ export const useItemsStore = defineStore('items', () => {
             if (this.parent && this.parent.node) {
                 this.parent.standardizeChildrenPos()
             } else {
-                console.log('local', this.isLocal)
                 if (!this.isLocal) // 不是从本地读取来的。
                     this.standardizeChildrenPos()
                 this.isLocal = false;
@@ -106,13 +106,22 @@ export const useItemsStore = defineStore('items', () => {
         del() {
             if (this.parent) {
                 const idx = this.parent.children.findIndex(item => item === this)
-                this.parent.children.splice(idx, 1)
+                this.parent.children.splice(idx, 1, ...this.children)
+                // console.log('will be deleted', this.node)
+                // console.log('will be attached', ...this.children)
+                //保留原始位置
+                this.children.forEach(child => {
+                    child.pos.left += this.pos.left
+                    child.pos.top += this.pos.top
+                    child.parent = this.parent
+                })
             } else {
                 const idx = topItems.value.findIndex(item => item === this)
                 topItems.value.splice(idx, 1)
             }
+            this.node = null;
             //调整剩余节点位置
-            this.InitialPosition()
+            // this.InitialPosition()
         }
         /**
          * 导出----提取实例属性
@@ -124,7 +133,7 @@ export const useItemsStore = defineStore('items', () => {
                 rect: toRaw(this.rect),
                 title: this.title,
                 id: this.id,
-                level: this.level,
+                // level: this.level,
                 next: [],
                 isLocal: true,
             }
@@ -139,7 +148,7 @@ export const useItemsStore = defineStore('items', () => {
             this.rect = reactive(ext.rect)
             this.title = ext.title
             this.id = ext.id
-            this.level = ext.level
+            // this.level = ext.level
             this.isLocal = ext.isLocal
         }
     }

@@ -15,7 +15,7 @@
     <!-- 子节点 -->
     <div class="children">
       <DragItem :tabNum="tabNum" :maskRect="maskRect" :showSelectMask="showSelectMask" :itemData="topItem"
-        :level="topItem.level" v-for=" topItem  of  props.itemData.children " :key="topItem.id">
+        :level="props.level+1" v-for=" topItem  of  props.itemData.children " :key="topItem.id">
       </DragItem>
     </div>
     <!-- 起点节点保存连线 -->
@@ -70,7 +70,7 @@ const dragItem = ref(null)
 /**
  * 处理不同主题的样式
  */
-let level = props.itemData.level
+let level = props.level
 const { themeconf, scaleRatio } = storeToRefs(itemsStore)
 const { handleStyle } = require('@/utils/handleStyle')
 const bgcStyle = computed(handleStyle(themeconf, level, 'backgroundColor'))
@@ -194,7 +194,7 @@ const contextmenuListOnItem = [{
 
 <style  scoped>
 .drag-item {
-  z-index: 9;
+  /* z-index: 9; */
   display: inline-block;
   position: absolute;
 }
