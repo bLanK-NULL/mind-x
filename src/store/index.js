@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, onMounted, h, computed, watch, onBeforeUpdate, reactive, toRef, toRaw, onBeforeMount } from 'vue'
+import { ref, onMounted, reactive, toRaw } from 'vue'
 import { successMsg, errorMsg } from '@/hooks/Message/globalMessage'
 const uuidv4 = require('uuid').v4;
 const lightTheme = require(`@/theme/default.js`)
@@ -108,8 +108,6 @@ export const useItemsStore = defineStore('items', () => {
             if (this.parent) {
                 const idx = this.parent.children.findIndex(item => item === this)
                 this.parent.children.splice(idx, 1, ...this.children)
-                // console.log('will be deleted', this.node)
-                // console.log('will be attached', ...this.children)
                 //保留原始位置
                 this.children.forEach(child => {
                     child.pos.left += this.pos.left
@@ -120,9 +118,8 @@ export const useItemsStore = defineStore('items', () => {
                 const idx = topItems.value.findIndex(item => item === this)
                 topItems.value.splice(idx, 1)
             }
+            this.node.remove();
             this.node = null;
-            //调整剩余节点位置
-            // this.InitialPosition()
         }
         /**
          * 导出----提取实例属性
