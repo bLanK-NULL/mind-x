@@ -139,11 +139,9 @@ function handleClickItem() {
   isSelectedItem.value = !isSelectedItem.value
 }
 //框选
-onMounted(() => {
-  //被框中的条件
-  watch(() => props.showSelectMask, (newVal) => {
-    if (newVal) return;
-    const dragItemRect = {
+const maskRect = inject('maskRect')
+eventBus.subscribe('multiSelected',()=> {
+  const dragItemRect = {
       width: props.itemData.node.getBoundingClientRect().width,
       height: props.itemData.node.getBoundingClientRect().height,
       centerY: props.itemData.node.getBoundingClientRect().y + props.itemData.node.getBoundingClientRect().height / 2,
@@ -153,8 +151,6 @@ onMounted(() => {
       && (props.maskRect.width > dragItemRect.width / 2 && props.maskRect.left < dragItemRect.centerX && props.maskRect.left + props.maskRect.width > dragItemRect.centerX)) {
       isSelectedItem.value = !isSelectedItem.value
     }
-
-  })
 })
 
 //处理tab -- isSelectedItem增加子节点

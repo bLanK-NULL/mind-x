@@ -57,6 +57,7 @@ const maskRect = reactive({
 })
 const selectMask = ref(null)
 const designer = ref(null)
+provide('maskRect',maskRect)
 onMounted(() => {
     designer.value.addEventListener('mousedown', (e) => {
         //点击相对于视口的坐标
@@ -78,6 +79,7 @@ onMounted(() => {
         function handleMouseUpOrLeave(e) {
             designer.value.removeEventListener('mousemove', handleMousemove)
             showSelectMask.value = false
+            eventBus.publish('multiSelected')
             nextTick(() => {
                 maskRect.width = 0;
                 maskRect.height = 0;
