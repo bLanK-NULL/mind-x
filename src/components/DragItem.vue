@@ -41,6 +41,7 @@ import { computed, nextTick, onMounted, reactive, ref, watchEffect, watch, onBef
 import { customSelect } from '@/utils/index.js'
 import { useItemsStore } from '@/store/index'
 import { storeToRefs } from 'pinia';
+import eventBus from '@/utils/eventBus';
 const itemsStore = useItemsStore()
 const props = defineProps({
   itemData: {
@@ -176,14 +177,11 @@ watch(() => props.tabNum, () => {
 /**
  * del键删除节点
  */
-onMounted(() => {
-  function handleDel(e) {
-    if (e.key === 'Delete' && isSelectedItem.value && dragItem.value) {
-      props.itemData.del()
-    }
+eventBus.subscribe('delete', () => {
+  if (isSelectedItem.value && dragItem.value) {
+    props.itemData.del();
   }
-  document.addEventListener('keydown', handleDel, true)
-})
+}, props.level)
 
 /**
  * 右键菜单 在item上触发时

@@ -26,6 +26,7 @@ import DragItem from '@/components/DragItem.vue';
 import { useItemsStore } from '@/store/index'
 import { storeToRefs } from 'pinia';
 import { successMsg, errorMsg } from '@/hooks/Message/globalMessage'
+import eventBus from '@/utils/eventBus';
 const itemsStore = useItemsStore()
 const { themeconf, scaleRatio, topItems } = storeToRefs(itemsStore)
 const { extractProject, initialViewportPos, designerRect, createDragItem } = itemsStore
@@ -180,8 +181,8 @@ const contextmenuListOnDesigner = [{
     fn: (e) => {
         const item = createDragItem(null)
         watch(item.rect, (newVal) => {
-            item.pos.left = (e.pageX - newVal.width/2) * scaleRatio.value;
-            item.pos.top = (e.pageY-newVal.height/2) * scaleRatio.value;
+            item.pos.left = (e.pageX - newVal.width / 2) * scaleRatio.value;
+            item.pos.top = (e.pageY - newVal.height / 2) * scaleRatio.value;
         }, { once: true })
 
         console.log(e)
@@ -203,6 +204,15 @@ window.addEventListener('keydown', (e) => {
         saveToLocal()
     }
 })
+
+// delete 事件
+function handleDel(e) {
+    if (e.key === 'Delete') {
+        // props.itemData.del()
+        eventBus.publish('delete')
+    }
+}
+window.addEventListener('keydown', handleDel)
 </script>
  
 <style scoped> .designer {
