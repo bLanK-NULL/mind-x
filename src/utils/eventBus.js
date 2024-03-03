@@ -16,7 +16,15 @@ class EventBus {
         if (!this.subscriber.has(name)) return;
         this.subscriber.get(name).forEach(item => item.cb());
     }
-
+    //取消订阅
+    unsubscribe(name, cb) {
+        if (!this.subscriber.has(name)) return;
+        this.subscriber.get(name).forEach((item, index) => {
+            if (item.cb === cb) {
+                this.subscriber.get(name).splice(index, 1);
+            }
+        })
+    }
 }
 const eventBus = new EventBus();
 

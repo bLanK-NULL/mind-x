@@ -3,13 +3,12 @@
         'background-color': themeconf.baseBackgroundColor,
     }" v-ctxmenu:[contextmenuListOnDesigner]>
         <div class="selectMask" ref="selectMask" v-if="showSelectMask" :style="{
-            width: maskRect.width / scaleRatio + 'px',
-            height: maskRect.height / scaleRatio + 'px',
-            left: maskRect.leftAbs + 'px',
-            top: maskRect.topAbs + 'px',
-        }"></div>
-        <DragItem :tabNum="tabNum" :maskRect="maskRect" :showSelectMask="showSelectMask" :itemData="topItem" :level=0
-            v-for="topItem of topItems" :key="topItem.id">
+        width: maskRect.width / scaleRatio + 'px',
+        height: maskRect.height / scaleRatio + 'px',
+        left: maskRect.leftAbs + 'px',
+        top: maskRect.topAbs + 'px',
+    }"></div>
+        <DragItem :tabNum="tabNum" :itemData="topItem" :level=0 v-for="topItem of topItems" :key="topItem.id">
         </DragItem>
         <Teleport to="body">
             <Transition name="showRatio">
@@ -57,7 +56,7 @@ const maskRect = reactive({
 })
 const selectMask = ref(null)
 const designer = ref(null)
-provide('maskRect',maskRect)
+provide('maskRect', maskRect)
 onMounted(() => {
     designer.value.addEventListener('mousedown', (e) => {
         //点击相对于视口的坐标
@@ -110,25 +109,18 @@ window.addEventListener('keydown', handleTab, false)
 /**
  * 按住空格移动
  */
-let isSpacePressed = false;
 function handleSpaceKeyDown(event) {
-    if (isSpacePressed) {
-        let scale = window.devicePixelRatio
-        window.scrollTo(window.scrollX - event.movementX / scale, window.scrollY - event.movementY / scale);
-    }
+    window.scrollBy(-event.movementX, -event.movementY)
 }
 window.addEventListener('keydown', function (e) {
     if (e.code === 'Space') {
         e.preventDefault()
-        isSpacePressed = true;
         document.body.style.cursor = 'grab';
         window.addEventListener('mousemove', handleSpaceKeyDown);
     }
 });
-
 window.addEventListener('keyup', function (event) {
     if (event.code === 'Space') {
-        isSpacePressed = false;
         document.body.style.cursor = 'default';
         window.removeEventListener('mousemove', handleSpaceKeyDown);
     }
@@ -216,50 +208,51 @@ function handleDel(e) {
 }
 window.addEventListener('keydown', handleDel)
 </script>
- 
-<style scoped> .designer {
-     width: v-bind("designerRect.width + 'px'");
-     height: v-bind('designerRect.height + "px"');
-     /* background: antiquewhite; */
-     position: absolute;
-     left: 0;
-     top: 0;
-     background-image: url('@/assets/bgGrid.svg');
-     transform-origin: 0 0;
- }
 
- .selectMask {
-     box-sizing: border-box;
-     border: 2px solid rgb(0, 60, 255);
-     background-color: rgba(120, 213, 250, 0.3);
-     position: absolute;
-     z-index: 99999 !important;
- }
+<style scoped>
+.designer {
+    width: v-bind("designerRect.width + 'px'");
+    height: v-bind('designerRect.height + "px"');
+    /* background: antiquewhite; */
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-image: url('@/assets/bgGrid.svg');
+    transform-origin: 0 0;
+}
 
- .showRatio {
-     position: fixed;
-     bottom: 32px;
-     left: 20px;
-     background-color: rgba(255, 255, 255, .3);
-     border: 1px solid #000;
-     border-radius: 50%;
-     width: 40px;
-     height: 40px;
-     box-sizing: border-bo x;
-     text-align: center;
-     line-height: 40px;
-     font-size: 14px;
-     user-select: none;
- }
+.selectMask {
+    box-sizing: border-box;
+    border: 2px solid rgb(0, 60, 255);
+    background-color: rgba(120, 213, 250, 0.3);
+    position: absolute;
+    z-index: 99999 !important;
+}
 
- /* vue 动画 */
- .showRatio-enter-active,
- .showRatio-leave-active {
-     transition: opacity 1s;
- }
+.showRatio {
+    position: fixed;
+    bottom: 32px;
+    left: 20px;
+    background-color: rgba(255, 255, 255, .3);
+    border: 1px solid #000;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    box-sizing: border-bo x;
+    text-align: center;
+    line-height: 40px;
+    font-size: 14px;
+    user-select: none;
+}
 
- .showRatio-enter-from,
- .showRatio-leave-to {
-     opacity: 0;
- }
+/* vue 动画 */
+.showRatio-enter-active,
+.showRatio-leave-active {
+    transition: opacity 1s;
+}
+
+.showRatio-enter-from,
+.showRatio-leave-to {
+    opacity: 0;
+}
 </style>

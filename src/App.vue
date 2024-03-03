@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <TopTools></TopTools>
+    <TopTools v-if="false"></TopTools>
     <Designer></Designer>
     <a-float-button @click="switchTheme" :class="{ 'dark': isDarkMode }">
       <template #icon>

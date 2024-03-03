@@ -118,8 +118,7 @@ export const useItemsStore = defineStore('items', () => {
                 const idx = topItems.value.findIndex(item => item === this)
                 topItems.value.splice(idx, 1)
             }
-            this.node.remove();
-            this.node = null;
+            this.node.remove();  
         }
         /**
          * 导出----提取实例属性

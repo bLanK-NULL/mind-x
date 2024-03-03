@@ -7,25 +7,25 @@
       'background-color': bgcStyle,
       'font-size': ftStyle,
       'color': ftColorStyle,
-    }" @click="handleClickItem" v-ctxmenu:[contextmenuListOnItem]>
+    }" @mousedown.capture="isSelectedItem=true" @mouseup="isSelectedItem=false" v-ctxmenu:[contextmenuListOnItem]>
       <div class="content" :contenteditable="contenteditable" @dblclick="handleEditTitle" @blur="afterHandleEditTitle"
         @keyup.enter.ctrl="contenteditable = false" v-html="props.itemData.title">
       </div>
     </div>
     <!-- 子节点 -->
     <div class="children">
-      <DragItem :tabNum="tabNum" :maskRect="maskRect" :showSelectMask="showSelectMask" :itemData="topItem"
-        :level="props.level + 1" v-for=" topItem  of  props.itemData.children " :key="topItem.id">
+      <DragItem :tabNum="tabNum" :itemData="topItem" :level="props.level + 1"
+        v-for=" topItem  of  props.itemData.children " :key="topItem.id">
       </DragItem>
     </div>
     <!-- 起点节点保存连线 -->
     <div class="s-line" v-if="props.itemData.node && props.itemData.rect.width !== 0">
       <svg v-for=" topItem  of  props.itemData.children " :key="topItem.id" :style="{
-        left: Math.min(topItem.pos.left, 0) + 'px', top: Math.min(topItem.pos.top, 0) + 'px',
-        width: Math.max(props.itemData.rect.width, topItem.pos.left + topItem.rect.width) - Math.min(topItem.pos.left, 0) + 'px',
-        height: Math.max(props.itemData.rect.height, topItem.pos.top + topItem.rect.height) - Math.min(topItem.pos.top, 0) + 'px'
-      }
-        ">
+      left: Math.min(topItem.pos.left, 0) + 'px', top: Math.min(topItem.pos.top, 0) + 'px',
+      width: Math.max(props.itemData.rect.width, topItem.pos.left + topItem.rect.width) - Math.min(topItem.pos.left, 0) + 'px',
+      height: Math.max(props.itemData.rect.height, topItem.pos.top + topItem.rect.height) - Math.min(topItem.pos.top, 0) + 'px'
+    }
+      ">
         <line :x1="props.itemData.rect.width / 2 - Math.min(topItem.pos.left, 0)"
           :y1="props.itemData.rect.height / 2 - Math.min(topItem.pos.top, 0)"
           :x2="topItem.pos.left + topItem.rect.width / 2 - Math.min(topItem.pos.left, 0)"
@@ -37,11 +37,12 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, reactive, ref, watchEffect, watch, onBeforeUpdate, toRef, inject, onBeforeMount, toRaw } from 'vue';
+import { computed, nextTick, onMounted, reactive, ref, watchEffect, watch, onBeforeUpdate, toRef, inject, onBeforeMount, toRaw, onBeforeUnmount } from 'vue';
 import { customSelect } from '@/utils/index.js'
 import { useItemsStore } from '@/store/index'
 import { storeToRefs } from 'pinia';
 import eventBus from '@/utils/eventBus';
+import { addSelectedItem, removeItem, selectedItemsMove } from '@/utils/multiSelected'
 const itemsStore = useItemsStore()
 const props = defineProps({
   itemData: {
@@ -54,12 +55,6 @@ const props = defineProps({
     type: Number,
     default: 0
   },
-  maskRect: {
-    type: Object
-  },
-  showSelectMask: {
-    type: Boolean
-  },
   tabNum: {
     type: Number,
     default: 0
@@ -67,7 +62,7 @@ const props = defineProps({
 })
 const contenteditable = ref(false)
 const dragItem = ref(null)
-const { themeconf, scaleRatio } = storeToRefs(itemsStore)
+const { themeconf, scaleRatio, topItems } = storeToRefs(itemsStore)
 /**
  * 处理不同主题的样式
  */
@@ -76,7 +71,7 @@ const { handleStyle } = require('@/utils/handleStyle')
 const bgcStyle = computed(handleStyle(themeconf, level, 'backgroundColor'))
 const ftStyle = computed(handleStyle(themeconf, level, 'fontSize'))
 const ftColorStyle = computed(handleStyle(themeconf, level, 'color'))
-
+const isSelectedItem = ref(false)
 /**
  * 绑定node
  */
@@ -92,21 +87,31 @@ onMounted(() => {
 const handleMousedown = function (e) {
   e.stopPropagation()
   props.itemData.isMoving = true;
-  window.addEventListener('mousemove', handleMouseMove, false)
-  window.addEventListener('mouseup', handleMouseUp, false)
+  // window.addEventListener('mousemove', handleMouseMove, false)
+  // window.addEventListener('mouseup', handleMouseUp, false)
+  selectedItemsMove(props.itemData, scaleRatio, topItems)
 }
-const handleMouseMove = function (e) {
-  if (props.itemData.isMoving) {
-    props.itemData.pos.left += e.movementX / scaleRatio.value
-    props.itemData.pos.top += e.movementY / scaleRatio.value
+// const handleMouseMove = function (e) {
+//   if (props.itemData.isMoving) {
+//     console.log('ismoving: ', props.level)
+//     props.itemData.pos.left += e.movementX / scaleRatio.value
+//     props.itemData.pos.top += e.movementY / scaleRatio.value
+//   }
+// }
+// const handleMouseUp = function (e) {
+//   props.itemData.isMoving = false;
+//   window.removeEventListener('mousemove', handleMouseMove, false)
+//   window.removeEventListener('mouseup', handleMouseUp, false)
+// }
+//维护 selectedItems表 在multiSelectedMove.js 中
+watch(isSelectedItem, (newVal) => {
+  if (newVal) {
+    // console.log('add', props.itemData)
+    addSelectedItem(props.itemData)
+  } else {
+    removeItem(props.itemData)
   }
-}
-const handleMouseUp = function (e) {
-  props.itemData.isMoving = false;
-  window.removeEventListener('mousemove', handleMouseMove, false)
-  window.removeEventListener('mouseup', handleMouseUp, false)
-}
-
+})
 
 /**
  * dblclick事件 修改title 的函数
@@ -134,23 +139,22 @@ function afterHandleEditTitle(e) {
 /**
  * 选择item (点击, 框选?)
  */
-const isSelectedItem = ref(false)
-function handleClickItem() {
-  isSelectedItem.value = !isSelectedItem.value
-}
+// function handleClickItem() {
+//   isSelectedItem.value = !isSelectedItem.value
+// }
 //框选
 const maskRect = inject('maskRect')
-eventBus.subscribe('multiSelected',()=> {
+eventBus.subscribe('multiSelected', () => {
   const dragItemRect = {
-      width: props.itemData.node.getBoundingClientRect().width,
-      height: props.itemData.node.getBoundingClientRect().height,
-      centerY: props.itemData.node.getBoundingClientRect().y + props.itemData.node.getBoundingClientRect().height / 2,
-      centerX: props.itemData.node.getBoundingClientRect().x + props.itemData.node.getBoundingClientRect().width / 2,
-    }
-    if ((props.maskRect.height > dragItemRect.height / 2 && props.maskRect.top < dragItemRect.centerY && props.maskRect.top + props.maskRect.height > dragItemRect.centerY)
-      && (props.maskRect.width > dragItemRect.width / 2 && props.maskRect.left < dragItemRect.centerX && props.maskRect.left + props.maskRect.width > dragItemRect.centerX)) {
-      isSelectedItem.value = !isSelectedItem.value
-    }
+    width: props.itemData.node.getBoundingClientRect().width,
+    height: props.itemData.node.getBoundingClientRect().height,
+    centerY: props.itemData.node.getBoundingClientRect().y + props.itemData.node.getBoundingClientRect().height / 2,
+    centerX: props.itemData.node.getBoundingClientRect().x + props.itemData.node.getBoundingClientRect().width / 2,
+  }
+  if ((maskRect.height > dragItemRect.height / 2 && maskRect.top < dragItemRect.centerY && maskRect.top + maskRect.height > dragItemRect.centerY)
+    && (maskRect.width > dragItemRect.width / 2 && maskRect.left < dragItemRect.centerX && maskRect.left + maskRect.width > dragItemRect.centerX)) {
+    isSelectedItem.value = !isSelectedItem.value
+  }
 })
 
 //处理tab -- isSelectedItem增加子节点
@@ -175,6 +179,7 @@ watch(() => props.tabNum, () => {
  */
 eventBus.subscribe('delete', () => {
   if (isSelectedItem.value && dragItem.value) {
+    isSelectedItem.value = false;
     props.itemData.del();
   }
 }, props.level)
@@ -194,7 +199,7 @@ const contextmenuListOnItem = [{
 }]
 </script>
 
-<style  scoped>
+<style scoped>
 .drag-item {
   /* z-index: 9; */
   display: inline-block;

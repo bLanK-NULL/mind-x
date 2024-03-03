@@ -18,10 +18,10 @@ import {Button} from 'ant-design-vue'
     align-items: center;
     position: fixed;
     left: auto;
-    top: 20px;
+    top: 0;
     width: 100%;
     height: 60px;
-    background-color: aqua;
+    background-color: rgba(0, 255, 255, 0.8);
     z-index: 999;
 }
 </style>
