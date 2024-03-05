@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
-import { ref, onMounted, reactive, toRaw } from 'vue'
+import { ref, onMounted, reactive, toRaw, onUpdated } from 'vue'
 import { successMsg, errorMsg } from '@/hooks/Message/globalMessage'
+import { getFromLocalForage } from '@/localForage/index'
+
 const uuidv4 = require('uuid').v4;
 const lightTheme = require(`@/theme/default.js`)
 const darkTheme = require(`@/theme/dark.js`)
@@ -71,6 +73,7 @@ export const useItemsStore = defineStore('items', () => {
             this.children.forEach((child, idx) => {
                 child.pos.top = (idx - (len - 1) / 2) * (child.rect.height + themeconf.value.verticalGap) - child.rect.height / 2 + this.rect.height / 2;
                 child.pos.left = this.rect.width + themeconf.value.horizonGap;
+                console.log('left', child.pos.left, this.rect.width, themeconf.value.horizonGap)
             })
             if (!this.parent) { //如果本结点还是顶层节点
                 const len = topItems.value.length
@@ -118,7 +121,7 @@ export const useItemsStore = defineStore('items', () => {
                 const idx = topItems.value.findIndex(item => item === this)
                 topItems.value.splice(idx, 1)
             }
-            this.node.remove();  
+            this.node.remove();
         }
         /**
          * 导出----提取实例属性
@@ -183,7 +186,7 @@ export const useItemsStore = defineStore('items', () => {
     //导出所有节点的必要实例属性和全局配置
     function extractProject() {
         const extract = traverseTopItems(topItems.value)
-        return JSON.stringify({
+        return {
             extract,
             themeName: themeconf.value.name,
             scaleRatio: scaleRatio.value,
@@ -191,7 +194,7 @@ export const useItemsStore = defineStore('items', () => {
                 x: window.scrollX,
                 y: window.scrollY
             }
-        })
+        }
     }
     function traverseTopItems(items) {
         if (!items || items.length === 0)
@@ -208,8 +211,10 @@ export const useItemsStore = defineStore('items', () => {
     }
 
     // 导入本地保存的记录 -- return false 代表导入失败
-    function importProject() {
-        const project = JSON.parse(localStorage.getItem('mind-x'))
+    async function importProject() {
+        // const project = JSON.parse(localStorage.getItem('mind-x'))
+        const project = await getFromLocalForage('mind-x')
+        // const project = JSON.parse(data)
         if (project) {
             // 导入全局数据
             setTheme(project.themeName)
@@ -247,17 +252,22 @@ export const useItemsStore = defineStore('items', () => {
 
 
     //如果不导入，则自动初始化三个初始节点
-    function initProject() {
-        const isSuccess = importProject()
+    async function initProject() {
+        const isSuccess = await importProject()
+        console.log('isSuccess', isSuccess)
         if (!isSuccess) {
-            console.log('自动初始化3个节点')
+            successMsg('自动初始化3个节点')
             const root = createDragItem(null)
             createDragItem(root)
             createDragItem(root)
-            onMounted(() => {
+            // onUpdated(() => {
+            // root.standardizeChildrenPos();
+            // })
+            Promise.resolve().then(() => {
                 root.standardizeChildrenPos();
             })
         }
+        window.scrollTo(initialViewportPos.x, initialViewportPos.y)
     }
     return {
         themeconf,

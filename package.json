@@ -9,6 +9,7 @@
   "dependencies": {
     "ant-design-vue": "^4.1.2",
     "core-js": "^3.8.3",
+    "localforage": "^1.10.0",
     "pinia": "^2.1.7",
     "uuid": "^9.0.1",
     "v-ctxmenu": "^3.0.0",

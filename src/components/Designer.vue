@@ -26,6 +26,7 @@ import { useItemsStore } from '@/store/index'
 import { storeToRefs } from 'pinia';
 import { successMsg, errorMsg } from '@/hooks/Message/globalMessage'
 import eventBus from '@/utils/eventBus';
+import { saveToLocalForage } from '@/localForage/index'
 const itemsStore = useItemsStore()
 const { themeconf, scaleRatio, topItems } = storeToRefs(itemsStore)
 const { extractProject, initialViewportPos, designerRect, createDragItem } = itemsStore
@@ -40,7 +41,7 @@ onMounted(() => {
     if ('scrollRestoration' in history) {
         history.scrollRestoration = 'manual';
     }
-    nextTick(() => window.scrollTo(initialViewportPos.x, initialViewportPos.y))
+    // nextTick(() => window.scrollTo(initialViewportPos.x, initialViewportPos.y))
     // })
 })
 
@@ -183,13 +184,8 @@ const contextmenuListOnDesigner = [{
     }
 }]
 function saveToLocal(e) {
-    const waitingToSaveJson = extractProject();
-    localStorage.setItem('mind-x', waitingToSaveJson);
-    if (localStorage.getItem('mind-x') === waitingToSaveJson) {
-        successMsg('保存到本地成功')
-    } else {
-        errorMsg('保存失败')
-    }
+    // const waitingToSaveJson = extractProject();
+    saveToLocalForage('mind-x', extractProject())
 }
 //保存ctrl+s
 window.addEventListener('keydown', (e) => {
