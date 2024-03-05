@@ -7,9 +7,9 @@
       'background-color': bgcStyle,
       'font-size': ftStyle,
       'color': ftColorStyle,
-    }" @mousedown.capture="isSelectedItem=true" @mouseup="isSelectedItem=false" v-ctxmenu:[contextmenuListOnItem]>
-      <div class="content" :contenteditable="contenteditable" @dblclick="handleEditTitle" @blur="afterHandleEditTitle"
-        @keyup.enter.ctrl="contenteditable = false" v-html="props.itemData.title">
+    }" @mousedown.capture="isSelectedItem = true" @mouseup="isSelectedItem = false" v-ctxmenu:[contextmenuListOnItem]>
+      <div ref="content" class="content" :contenteditable="contenteditable" @dblclick="handleEditTitle"
+        @blur="afterHandleEditTitle" @keyup.enter.ctrl="contenteditable = false" v-html="props.itemData.title">
       </div>
     </div>
     <!-- 子节点 -->
@@ -38,7 +38,7 @@
 
 <script setup>
 import { computed, nextTick, onMounted, reactive, ref, watchEffect, watch, onBeforeUpdate, toRef, inject, onBeforeMount, toRaw, onBeforeUnmount } from 'vue';
-import { customSelect } from '@/utils/index.js'
+import { customSelect } from '@/utils/customSelect.js'
 import { useItemsStore } from '@/store/index'
 import { storeToRefs } from 'pinia';
 import eventBus from '@/utils/eventBus';
@@ -187,15 +187,21 @@ eventBus.subscribe('delete', () => {
 /**
  * 右键菜单 在item上触发时
  */
+const content = ref(null)
 const contextmenuListOnItem = [{
   title: '编辑',
-  fn: () => console.log('编辑')
+  fn: () => {
+    contenteditable.value = true;
+    nextTick(() => {
+      customSelect(content.value)
+    })
+  }
 }, {
   title: '删除',
-  fn: null
-}, {
-  title: '复制',
-  fn: null
+  fn: () => {
+    props.itemData.del();
+    customSelect()
+  }
 }]
 </script>
 
@@ -222,7 +228,7 @@ const contextmenuListOnItem = [{
 
 .selected-item {
   /*border: 3px solid black;*/
-  box-shadow: 0px 0px 3px 2px rgb(4, 229, 49) !important;
+  box-shadow: 0px 0px 3px 2px rgb(23, 228, 64) !important;
 }
 
 .drag-item>.item>.content {

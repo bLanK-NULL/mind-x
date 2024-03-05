@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, onMounted, reactive, toRaw, onUpdated } from 'vue'
+import { ref, onMounted, reactive, toRaw, onUpdated, nextTick } from 'vue'
 import { successMsg, errorMsg } from '@/hooks/Message/globalMessage'
 import { getFromLocalForage } from '@/localForage/index'
 
@@ -254,18 +254,12 @@ export const useItemsStore = defineStore('items', () => {
     //如果不导入，则自动初始化三个初始节点
     async function initProject() {
         const isSuccess = await importProject()
-        console.log('isSuccess', isSuccess)
         if (!isSuccess) {
             successMsg('自动初始化3个节点')
             const root = createDragItem(null)
             createDragItem(root)
-            createDragItem(root)
-            // onUpdated(() => {
-            // root.standardizeChildrenPos();
-            // })
-            Promise.resolve().then(() => {
-                root.standardizeChildrenPos();
-            })
+            createDragItem(root) 
+            nextTick(()=>  root.standardizeChildrenPos())
         }
         window.scrollTo(initialViewportPos.x, initialViewportPos.y)
     }
