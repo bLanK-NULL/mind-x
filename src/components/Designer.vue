@@ -176,11 +176,10 @@ const contextmenuListOnDesigner = [{
     fn: (e) => {
         const item = createDragItem(null)
         watch(item.rect, (newVal) => {
-            item.pos.left = (e.pageX - newVal.width / 2) * scaleRatio.value;
-            item.pos.top = (e.pageY - newVal.height / 2) * scaleRatio.value;
+            console.log('add', item)
+            item.pos.left = (e.pageX - newVal.width / 2) / scaleRatio.value;
+            item.pos.top = (e.pageY - newVal.height / 2) / scaleRatio.value;
         }, { once: true })
-
-        console.log(e)
     }
 }]
 function saveToLocal(e) {

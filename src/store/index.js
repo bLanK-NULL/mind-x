@@ -73,7 +73,7 @@ export const useItemsStore = defineStore('items', () => {
             this.children.forEach((child, idx) => {
                 child.pos.top = (idx - (len - 1) / 2) * (child.rect.height + themeconf.value.verticalGap) - child.rect.height / 2 + this.rect.height / 2;
                 child.pos.left = this.rect.width + themeconf.value.horizonGap;
-                console.log('left', child.pos.left, this.rect.width, themeconf.value.horizonGap)
+                // console.log('left', child.pos.left, this.rect.width, themeconf.value.horizonGap)
             })
             if (!this.parent) { //如果本结点还是顶层节点
                 const len = topItems.value.length

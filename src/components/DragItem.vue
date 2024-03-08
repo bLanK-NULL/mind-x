@@ -228,7 +228,7 @@ const contextmenuListOnItem = [{
 
 .selected-item {
   /*border: 3px solid black;*/
-  box-shadow: 0px 0px 3px 2px rgb(23, 228, 64) !important;
+  box-shadow: 0px 0px 3px 2px rgb(255, 252, 62) !important;
 }
 
 .drag-item>.item>.content {
