@@ -24,9 +24,10 @@ import { computed, nextTick, onBeforeMount, onMounted, provide, reactive, ref, t
 import DragItem from '@/components/DragItem.vue';
 import { useItemsStore } from '@/store/index'
 import { storeToRefs } from 'pinia';
-import { successMsg, errorMsg } from '@/hooks/Message/globalMessage'
+import { successMsg, errorMsg, infoMsg } from '@/hooks/Message/globalMessage'
 import eventBus from '@/utils/eventBus';
 import { saveToLocalForage } from '@/localForage/index'
+import { uploadProject } from '@/http/index.js'
 const itemsStore = useItemsStore()
 const { themeconf, scaleRatio, topItems } = storeToRefs(itemsStore)
 const { extractProject, initialViewportPos, designerRect, createDragItem } = itemsStore
@@ -170,18 +171,27 @@ function keepCenter(newScale, oldScale = 1) {
 // binding.arg
 const contextmenuListOnDesigner = [{
     title: '保存',
-    fn: saveToLocal
+    fn: saveProject
 }, {
     title: '添加',
     fn: (e) => {
         const item = createDragItem(null)
         watch(item.rect, (newVal) => {
-            console.log('add', item)
             item.pos.left = (e.pageX - newVal.width / 2) / scaleRatio.value;
             item.pos.top = (e.pageY - newVal.height / 2) / scaleRatio.value;
         }, { once: true })
     }
 }]
+async function saveProject(e) {
+    const data = JSON.stringify(extractProject())
+    const res = await uploadProject('mind-x', data) 
+    if (res && res.success) {
+        successMsg('上传成功')
+    } else {
+        successMsg('转为本地保存...')
+        saveToLocal()
+    }
+}
 function saveToLocal(e) {
     // const waitingToSaveJson = extractProject();
     saveToLocalForage('mind-x', extractProject())

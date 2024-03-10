@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, onMounted, reactive, toRaw, onUpdated, nextTick } from 'vue'
-import { successMsg, errorMsg } from '@/hooks/Message/globalMessage'
+import { successMsg, errorMsg, infoMsg } from '@/hooks/Message/globalMessage'
 import { getFromLocalForage } from '@/localForage/index'
+import { getProjectFromServer } from '@/http/index'
 
 const uuidv4 = require('uuid').v4;
 const lightTheme = require(`@/theme/default.js`)
@@ -193,7 +194,8 @@ export const useItemsStore = defineStore('items', () => {
             viewportPos: {
                 x: window.scrollX,
                 y: window.scrollY
-            }
+            },
+            stamp: +new Date()
         }
     }
     function traverseTopItems(items) {
@@ -213,24 +215,34 @@ export const useItemsStore = defineStore('items', () => {
     // 导入本地保存的记录 -- return false 代表导入失败
     async function importProject() {
         // const project = JSON.parse(localStorage.getItem('mind-x'))
-        const project = await getFromLocalForage('mind-x')
-        // const project = JSON.parse(data)
-        if (project) {
-            // 导入全局数据
-            setTheme(project.themeName)
-            scaleRatio.value = project.scaleRatio
-            initialViewportPos.x = project.viewportPos.x
-            initialViewportPos.y = project.viewportPos.y
-            // 导入所有节点的数据
-            topItems.value = traverseExtract(project.extract)
-            if (topItems.value.length === 0)
+        let project = await getFromLocalForage('mind-x')
+        if (project) {//本地有数据
+            const res = await getProjectFromServer('mind-x', project.stamp)
+            if (res && res.success && res.data) {//服务器数据是最新的
+                project = JSON.parse(res.data)
+            }
+
+        } else {//本地无数据
+            const res = await getProjectFromServer('mind-x')
+            if (res && res.success && res.data) {
+                project = JSON.parse(res.data)
+            } else {
                 return false;
-            successMsg('本地导入成功')
-            return true;
-        } else {
-            errorMsg('无本地记录')
+            }
+        }
+        // 导入全局数据
+        setTheme(project.themeName)
+        scaleRatio.value = project.scaleRatio
+        initialViewportPos.x = project.viewportPos.x
+        initialViewportPos.y = project.viewportPos.y
+        // 导入所有节点的数据
+        topItems.value = traverseExtract(project.extract)
+        if (topItems.value.length === 0) {
+            errorMsg('导入失败')
             return false;
         }
+        successMsg('导入成功')
+        return true;
     }
     /** 
      * @returns extract数据下还原的topItems:  DragItems[]
@@ -255,11 +267,11 @@ export const useItemsStore = defineStore('items', () => {
     async function initProject() {
         const isSuccess = await importProject()
         if (!isSuccess) {
-            successMsg('自动初始化3个节点')
+            successMsg('新项目创建中....')
             const root = createDragItem(null)
             createDragItem(root)
-            createDragItem(root) 
-            nextTick(()=>  root.standardizeChildrenPos())
+            createDragItem(root)
+            nextTick(() => root.standardizeChildrenPos())
         }
         window.scrollTo(initialViewportPos.x, initialViewportPos.y)
     }

@@ -3,10 +3,10 @@ import { successMsg, errorMsg } from '@/hooks/Message/globalMessage'
 
 function saveToLocalForage(key, value) {
     localforage.setItem(key, value).then(res => {
-        successMsg('保存成功')
+        successMsg('本地保存成功')
         // console.log(res)
     }).catch(err => {
-        errorMsg('保存失败')
+        errorMsg('本地保存失败')
         throw err
     })
 }
