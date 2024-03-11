@@ -213,17 +213,17 @@ export const useItemsStore = defineStore('items', () => {
     }
 
     // 导入本地保存的记录 -- return false 代表导入失败
-    async function importProject() {
+    async function importProject(pname) {
         // const project = JSON.parse(localStorage.getItem('mind-x'))
-        let project = await getFromLocalForage('mind-x')
+        let project = await getFromLocalForage(pname)
         if (project) {//本地有数据
-            const res = await getProjectFromServer('mind-x', project.stamp)
+            const res = await getProjectFromServer(pname, project.stamp)
             if (res && res.success && res.data) {//服务器数据是最新的
                 project = JSON.parse(res.data)
             }
 
         } else {//本地无数据
-            const res = await getProjectFromServer('mind-x')
+            const res = await getProjectFromServer(pname)
             if (res && res.success && res.data) {
                 project = JSON.parse(res.data)
             } else {
@@ -264,8 +264,8 @@ export const useItemsStore = defineStore('items', () => {
 
 
     //如果不导入，则自动初始化三个初始节点
-    async function initProject() {
-        const isSuccess = await importProject()
+    async function initProject(pname) {
+        const isSuccess = await importProject(pname)
         if (!isSuccess) {
             successMsg('新项目创建中....')
             const root = createDragItem(null)

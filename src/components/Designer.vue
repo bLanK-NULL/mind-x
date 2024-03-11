@@ -32,6 +32,12 @@ const itemsStore = useItemsStore()
 const { themeconf, scaleRatio, topItems } = storeToRefs(itemsStore)
 const { extractProject, initialViewportPos, designerRect, createDragItem } = itemsStore
 
+const props = defineProps({
+    pname: {
+        type: String,
+        default: '默认名称'
+    }
+})
 /**
  * 初始化画布位置
  */
@@ -184,7 +190,7 @@ const contextmenuListOnDesigner = [{
 }]
 async function saveProject(e) {
     const data = JSON.stringify(extractProject())
-    const res = await uploadProject('mind-x', data) 
+    const res = await uploadProject(props.pname, data)
     if (res && res.success) {
         successMsg('上传成功')
     } else {
@@ -194,13 +200,13 @@ async function saveProject(e) {
 }
 function saveToLocal(e) {
     // const waitingToSaveJson = extractProject();
-    saveToLocalForage('mind-x', extractProject())
+    saveToLocalForage(props.pname, extractProject())
 }
 //保存ctrl+s
 window.addEventListener('keydown', (e) => {
     if (e.ctrlKey && e.key === 's') {
         e.preventDefault()
-        saveToLocal()
+        saveProject()
     }
 })
 

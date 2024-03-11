@@ -1,7 +1,7 @@
 <template>
     <div class="container">
       <TopTools v-if="false"></TopTools>
-      <Designer></Designer>
+      <Designer :pname="route.query.pname"></Designer>
       <a-float-button @click="switchTheme" :class="{ 'dark': isDarkMode }">
         <template #icon>
           <MyIconComp></MyIconComp>
@@ -15,16 +15,17 @@
   import Designer from '@/components/Designer.vue';
   import TopTools from '@/components/TopTools.vue';
   import { useItemsStore } from '@/store/index'
-  
+  import { useRouter, useRoute } from 'vue-router';
   import { createFromIconfontCN } from '@ant-design/icons-vue';
   import { defineComponent } from 'vue';
   import { storeToRefs } from 'pinia';
   const itemstore = useItemsStore()
   const { themeconf, topItems } = storeToRefs(itemstore)
   const { setTheme, createDragItem,initProject } = itemstore
-  
+  const route = useRoute();
+  console.log(route.query.pname)
   //初始化 导入本地||生成3个初始节点
-  initProject()
+  initProject(route.query.pname)
   
   //白天模式和黑夜模式的图标
   const MyIcon = createFromIconfontCN({

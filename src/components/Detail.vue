@@ -3,7 +3,7 @@
         <a-layout-sider :style="{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0, top: 0, bottom: 0 }">
             <div class="logo" />
             <a-menu v-model:selectedKeys="selectedKeys" theme="dark" mode="inline">
-                <a-menu-item v-for="(nav, index) of navList" :key="String(index)">
+                <a-menu-item v-for="(nav, index) of navList" :key="String(index)" @click="createNewProject(nav)">
                     <span class="nav-text">{{ nav }}</span>
                 </a-menu-item>
             </a-menu>
@@ -18,7 +18,7 @@
                 <div :style="{ padding: '24px', background: '#fff', textAlign: 'center' }">
                     <a-typography-title :level="4" style="text-align: left">我的项目</a-typography-title>
                     <a-divider />
-                    <Project-card></Project-card>
+                    <Project-card :allProjectName="allProjectName.data"></Project-card>
                     <a-typography-title :level="4" style="text-align: left">模板</a-typography-title>
                     <a-divider />
                     <Project-card></Project-card>
@@ -33,15 +33,26 @@
 </template>
 
 <script setup>
-import { ref, defineComponent } from 'vue';
+import { ref, onBeforeMount } from 'vue';
 import ProjectCard from '@/components/ProjectCard'
+import { getAllProjectName } from '@/http';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const selectedKeys = ref(['0']);
 const navList = [
     '文件',
     '社区',
-    '导入/导出'
+    '导入/导出',
+    '新建项目'
 ]
-
+const allProjectName = ref([])
+onBeforeMount(async () => {
+    allProjectName.value = await getAllProjectName();
+})
+function createNewProject(nav) {
+    if (nav === '新建项目')
+        window.open(router.resolve({ name: 'DesignContainer', query: { pname: +new Date } }).href, '_blank')
+}
 </script>
 
 <style scoped>
