@@ -20,7 +20,7 @@
     </div>
     <!-- 起点节点保存连线 -->
     <div class="s-line" v-if="props.itemData.node && props.itemData.rect.width !== 0">
-      <svg v-for=" topItem  of  props.itemData.children " :key="topItem.id" :style="{
+      <!-- <svg v-for=" topItem  of  props.itemData.children " :key="topItem.id" :style="{
       left: Math.min(topItem.pos.left, 0) + 'px', top: Math.min(topItem.pos.top, 0) + 'px',
       width: Math.max(props.itemData.rect.width, topItem.pos.left + topItem.rect.width) - Math.min(topItem.pos.left, 0) + 'px',
       height: Math.max(props.itemData.rect.height, topItem.pos.top + topItem.rect.height) - Math.min(topItem.pos.top, 0) + 'px'
@@ -31,7 +31,9 @@
           :x2="topItem.pos.left + topItem.rect.width / 2 - Math.min(topItem.pos.left, 0)"
           :y2="topItem.pos.top + topItem.rect.height / 2 - Math.min(topItem.pos.top, 0)" stroke="crimson"
           stroke-width="2" />
-      </svg>
+      </svg> -->
+      <Line v-for="childItem of itemData.children" :key="childItem.id" :childRect="childItem.rect"
+        :childPos="childItem.pos" :parentRect="itemData.rect"></Line>
     </div>
   </div>
 </template>
@@ -43,6 +45,7 @@ import { useItemsStore } from '@/store/index'
 import { storeToRefs } from 'pinia';
 import eventBus from '@/utils/eventBus';
 import { addSelectedItem, removeItem, selectedItemsMove } from '@/utils/multiSelected'
+import Line from '@/components/Line'
 const itemsStore = useItemsStore()
 const props = defineProps({
   itemData: {
@@ -241,9 +244,8 @@ const contextmenuListOnItem = [{
   outline: none;
 }
 
-.drag-item svg {
+/* .drag-item svg {
   position: absolute;
   z-index: -9;
-
-}
+} */
 </style>

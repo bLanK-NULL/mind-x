@@ -2,6 +2,7 @@
     <div class="designer" ref="designer" :style="{
         'background-color': themeconf.baseBackgroundColor,
     }" v-ctxmenu:[contextmenuListOnDesigner]>
+        desinger start!!!!!!
         <div class="selectMask" ref="selectMask" v-if="showSelectMask" :style="{
         width: maskRect.width / scaleRatio + 'px',
         height: maskRect.height / scaleRatio + 'px',
@@ -28,6 +29,8 @@ import { successMsg, errorMsg, infoMsg } from '@/hooks/Message/globalMessage'
 import eventBus from '@/utils/eventBus';
 import { saveToLocalForage } from '@/localForage/index'
 import { uploadProject } from '@/http/index.js'
+import { exportNodeToPDF } from '@/utils/exportPdf';
+import getBounding from '@/utils/getBounding';
 const itemsStore = useItemsStore()
 const { themeconf, scaleRatio, topItems } = storeToRefs(itemsStore)
 const { extractProject, initialViewportPos, designerRect, createDragItem } = itemsStore
@@ -187,6 +190,12 @@ const contextmenuListOnDesigner = [{
             item.pos.top = (e.pageY - newVal.height / 2) / scaleRatio.value;
         }, { once: true })
     }
+}, {
+    title: '导出pdf',
+    fn: () => exportNodeToPDF(designer.value, scaleRatio.value)
+}, {
+    title: 'beta-getBounding',
+    fn: () => { console.log(getBounding(topItems.value)) }
 }]
 async function saveProject(e) {
     const data = JSON.stringify(extractProject())
