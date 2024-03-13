@@ -6,7 +6,7 @@ import { errorMsg } from '@/hooks/Message/globalMessage'
 
 const routes = [
     {
-        path: '/', component: import('@/components/DesignContainer.vue'), name: 'DesignContainer', beforeEnter: (to, from, next) => {
+        path: '/', component: DesignContainer, name: 'DesignContainer', beforeEnter: (to, from, next) => {
             if (!to.query.pname) {
                 errorMsg('不存在该项目')
                 next({ name: 'detail' })
