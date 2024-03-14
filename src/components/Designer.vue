@@ -33,7 +33,7 @@ import { exportNodeToPDF } from '@/utils/exportPdf';
 import getBounding from '@/utils/getBounding';
 const itemsStore = useItemsStore()
 const { themeconf, scaleRatio, topItems } = storeToRefs(itemsStore)
-const { extractProject, initialViewportPos, designerRect, createDragItem } = itemsStore
+const { extractProject, designerRect, createDragItem } = itemsStore
 
 const props = defineProps({
     pname: {
@@ -51,8 +51,6 @@ onMounted(() => {
     if ('scrollRestoration' in history) {
         history.scrollRestoration = 'manual';
     }
-    // nextTick(() => window.scrollTo(initialViewportPos.x, initialViewportPos.y))
-    // })
 })
 
 //框选
@@ -192,20 +190,18 @@ const contextmenuListOnDesigner = [{
     }
 }, {
     title: '导出pdf',
-    fn: () => exportNodeToPDF(designer.value, scaleRatio.value)
-}, {
-    title: 'beta-getBounding',
-    fn: () => { console.log(getBounding(topItems.value)) }
+    fn: () => exportNodeToPDF(designer.value)
 }]
-async function saveProject(e) {
+function saveProject(e) {
     const data = JSON.stringify(extractProject())
-    const res = await uploadProject(props.pname, data)
-    if (res && res.success) {
-        successMsg('上传成功')
-    } else {
-        successMsg('转为本地保存...')
-        saveToLocal()
-    }
+    uploadProject(props.pname, data).then(res => {
+        if (res && res.success) {
+            successMsg('上传成功')
+        } else {
+            successMsg('转为本地保存...')
+            saveToLocal()
+        }
+    })
 }
 function saveToLocal(e) {
     // const waitingToSaveJson = extractProject();

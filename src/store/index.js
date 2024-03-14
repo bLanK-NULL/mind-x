@@ -65,6 +65,7 @@ export const useItemsStore = defineStore('items', () => {
             // if (this.node) {
             //     this.mount(this.node)
             // }
+            // clientWidth 不受scale影响
             this.rect.width = this.node.clientWidth;
             this.rect.height = this.node.clientHeight;
         }
@@ -282,8 +283,7 @@ export const useItemsStore = defineStore('items', () => {
         createDragItem,
         scaleRatio,
         extractProject,
-        initProject,
-        initialViewportPos,
+        initProject, 
         designerRect
     }
 
