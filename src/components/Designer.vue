@@ -2,7 +2,6 @@
     <div class="designer" ref="designer" :style="{
         'background-color': themeconf.baseBackgroundColor,
     }" v-ctxmenu:[contextmenuListOnDesigner]>
-        desinger start!!!!!!
         <div class="selectMask" ref="selectMask" v-if="showSelectMask" :style="{
         width: maskRect.width / scaleRatio + 'px',
         height: maskRect.height / scaleRatio + 'px',
@@ -21,7 +20,7 @@
 
 
 <script setup>
-import { computed, nextTick, onBeforeMount, onMounted, provide, reactive, ref, toRef, watch, toRaw, getCurrentInstance } from 'vue';
+import { computed, nextTick, onBeforeMount, onMounted, provide, reactive, ref, toRef, watch, toRaw, getCurrentInstance, onBeforeUnmount } from 'vue';
 import DragItem from '@/components/DragItem.vue';
 import { useItemsStore } from '@/store/index'
 import { storeToRefs } from 'pinia';
@@ -67,36 +66,40 @@ const selectMask = ref(null)
 const designer = ref(null)
 provide('maskRect', maskRect)
 onMounted(() => {
-    designer.value.addEventListener('mousedown', (e) => {
-        //点击相对于视口的坐标
-        maskRect.left = e.clientX;
-        maskRect.top = e.clientY;
-        //点击相对于designer的坐标
-        maskRect.leftAbs = e.pageX / scaleRatio.value;
-        maskRect.topAbs = e.pageY / scaleRatio.value;
-
-        designer.value.addEventListener('mousemove', handleMousemove)
-        function handleMousemove(e) {
-            showSelectMask.value = true
-            //随着缩放倍率而变化宽高
-            maskRect.width += e.movementX
-            maskRect.height += e.movementY
-        }
-        designer.value.addEventListener('mouseup', handleMouseUpOrLeave)
-        designer.value.addEventListener('mouseleave', handleMouseUpOrLeave)
-        function handleMouseUpOrLeave(e) {
-            designer.value.removeEventListener('mousemove', handleMousemove)
-            showSelectMask.value = false
-            eventBus.publish('multiSelected')
-            nextTick(() => {
-                maskRect.width = 0;
-                maskRect.height = 0;
-            })
-            designer.value.removeEventListener('mouseup', handleMouseUpOrLeave)
-            designer.value.removeEventListener('mouseleave', handleMouseUpOrLeave)
-        }
-    })
+    designer.value.addEventListener('mousedown', handleSelectMask)
 })
+onBeforeUnmount(() => {
+    designer.value.removeEventListener('mousedown', handleSelectMask)
+})
+function handleSelectMask(e) {
+    //点击相对于视口的坐标
+    maskRect.left = e.clientX;
+    maskRect.top = e.clientY;
+    //点击相对于designer的坐标
+    maskRect.leftAbs = e.pageX / scaleRatio.value;
+    maskRect.topAbs = e.pageY / scaleRatio.value;
+
+    designer.value.addEventListener('mousemove', handleMousemove)
+    function handleMousemove(e) {
+        showSelectMask.value = true
+        //随着缩放倍率而变化宽高
+        maskRect.width += e.movementX
+        maskRect.height += e.movementY
+    }
+    designer.value.addEventListener('mouseup', handleMouseUpOrLeave)
+    designer.value.addEventListener('mouseleave', handleMouseUpOrLeave)
+    function handleMouseUpOrLeave(e) {
+        designer.value.removeEventListener('mousemove', handleMousemove)
+        showSelectMask.value = false
+        eventBus.publish('multiSelected')
+        nextTick(() => {
+            maskRect.width = 0;
+            maskRect.height = 0;
+        })
+        designer.value.removeEventListener('mouseup', handleMouseUpOrLeave)
+        designer.value.removeEventListener('mouseleave', handleMouseUpOrLeave)
+    }
+}
 
 /**
  * tab键增加节点
@@ -113,7 +116,7 @@ function handleTab(e) {
     }
 }
 window.addEventListener('keydown', handleTab, false)
-
+onBeforeUnmount('keydown', handleTab, false)
 
 /**
  * 按住空格移动

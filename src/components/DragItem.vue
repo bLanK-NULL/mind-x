@@ -87,6 +87,9 @@ onMounted(() => {
   //给dragItem 下的item 绑定事件，  因为dragItem里有svg线段和子节点,不能在其上注册事件
   dragItem.value.firstElementChild.addEventListener('mousedown', handleMousedown, false)
 })
+onBeforeUnmount(() => {
+  dragItem.value && dragItem.value.firstElementChild.removeEventListener('mousedown', handleMousedown, false)
+})
 const handleMousedown = function (e) {
   e.stopPropagation()
   props.itemData.isMoving = true;
@@ -148,6 +151,7 @@ function afterHandleEditTitle(e) {
 //框选
 const maskRect = inject('maskRect')
 eventBus.subscribe('multiSelected', () => {
+  if (!props.itemData.node) return;
   const dragItemRect = {
     width: props.itemData.node.getBoundingClientRect().width,
     height: props.itemData.node.getBoundingClientRect().height,

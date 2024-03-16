@@ -3,7 +3,8 @@ import DesignContainer from '@/components/DesignContainer.vue'
 import Login from '@/components/Login'
 import Detail from '@/components/Detail'
 import { errorMsg } from '@/hooks/Message/globalMessage'
-
+import { storeToRefs } from 'pinia';
+import { useItemsStore } from '@/store';
 const routes = [
     {
         path: '/', component: DesignContainer, name: 'DesignContainer', beforeEnter: (to, from, next) => {
@@ -14,7 +15,9 @@ const routes = [
         },
     },
     { path: '/login', component: Login, name: 'login' }
-    , { path: '/detail', component: Detail, name: 'detail' }
+    , {
+        path: '/detail', component: Detail, name: 'detail'
+    }
 ]
 
 const router = createRouter({

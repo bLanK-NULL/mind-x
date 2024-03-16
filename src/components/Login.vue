@@ -48,6 +48,9 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
 import { successMsg, errorMsg } from '@/hooks/Message/globalMessage.js'
 import { login } from '@/http/index'
 import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import { useItemsStore } from '@/store';
+const { username } = storeToRefs(useItemsStore())
 const router = useRouter()
 const formState = reactive({
     username: '',
@@ -60,6 +63,7 @@ const disabled = computed(() => {
 function toLogin() {
     login(formState.username, formState.password).then(res => {
         console.log(res)
+        username.value = res.data.username;
         successMsg('登录成功')
         router.push({
             name: 'detail'

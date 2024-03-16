@@ -124,6 +124,7 @@ export const useItemsStore = defineStore('items', () => {
                 topItems.value.splice(idx, 1)
             }
             this.node.remove();
+            this.node = null;
         }
         /**
          * 导出----提取实例属性
@@ -276,6 +277,9 @@ export const useItemsStore = defineStore('items', () => {
         }
         window.scrollTo(initialViewportPos.x, initialViewportPos.y)
     }
+
+    //username
+    const username = ref('')
     return {
         themeconf,
         setTheme,
@@ -284,7 +288,8 @@ export const useItemsStore = defineStore('items', () => {
         scaleRatio,
         extractProject,
         initProject, 
-        designerRect
+        designerRect,
+        username
     }
 
 })
