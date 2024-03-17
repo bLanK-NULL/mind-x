@@ -8,7 +8,7 @@
         left: maskRect.leftAbs + 'px',
         top: maskRect.topAbs + 'px',
     }"></div>
-        <DragItem :tabNum="tabNum" :itemData="topItem" :level=0 v-for="topItem of topItems" :key="topItem.id">
+        <DragItem :itemData="topItem" :level=0 v-for="topItem of topItems" :key="topItem.id">
         </DragItem>
         <Teleport to="body">
             <Transition name="showRatio">
@@ -29,7 +29,7 @@ import eventBus from '@/utils/eventBus';
 import { saveToLocalForage } from '@/localForage/index'
 import { uploadProject } from '@/http/index.js'
 import { exportNodeToPDF } from '@/utils/exportPdf';
-import getBounding from '@/utils/getBounding';
+import { withdraw } from '@/utils/revocableOp';
 const itemsStore = useItemsStore()
 const { themeconf, scaleRatio, topItems } = storeToRefs(itemsStore)
 const { extractProject, designerRect, createDragItem } = itemsStore
@@ -105,14 +105,9 @@ function handleSelectMask(e) {
  * tab键增加节点
  * @param {Object} dragItem 
  */
-const tabNum = ref(0)
 function handleTab(e) {
     if (e.key === 'Tab') {
-        e.preventDefault()
-        e.stopPropagation()
-        // console.log('Tab');
-        tabNum.value++;
-        return false;
+        eventBus.publish('tab')
     }
 }
 window.addEventListener('keydown', handleTab, false)
@@ -222,10 +217,19 @@ window.addEventListener('keydown', (e) => {
 function handleDel(e) {
     if (e.key === 'Delete') {
         // props.itemData.del()
-        eventBus.publish('delete')
+        eventBus.publish('del')
     }
 }
 window.addEventListener('keydown', handleDel)
+
+window.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.key === 'z') {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('withdraw')
+        withdraw();
+    }
+})
 </script>
 
 <style scoped>

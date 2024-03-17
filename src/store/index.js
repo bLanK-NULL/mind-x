@@ -3,6 +3,7 @@ import { ref, onMounted, reactive, toRaw, onUpdated, nextTick } from 'vue'
 import { successMsg, errorMsg, infoMsg } from '@/hooks/Message/globalMessage'
 import { getFromLocalForage } from '@/localForage/index'
 import { getProjectFromServer } from '@/http/index'
+import { record } from '@/utils/revocableOp'
 
 const uuidv4 = require('uuid').v4;
 const lightTheme = require(`@/theme/default.js`)
@@ -110,8 +111,10 @@ export const useItemsStore = defineStore('items', () => {
         }
         //删除当前节点 -- 子节点挂载到父节点上去
         del() {
+            let idx;
+            let length = this.children.length;
             if (this.parent) {
-                const idx = this.parent.children.findIndex(item => item === this)
+                idx = this.parent.children.findIndex(item => item === this)
                 this.parent.children.splice(idx, 1, ...this.children)
                 //保留原始位置
                 this.children.forEach(child => {
@@ -120,11 +123,13 @@ export const useItemsStore = defineStore('items', () => {
                     child.parent = this.parent
                 })
             } else {
-                const idx = topItems.value.findIndex(item => item === this)
+                idx = topItems.value.findIndex(item => item === this)
                 topItems.value.splice(idx, 1)
             }
             this.node.remove();
             this.node = null;
+            record('del', { itemData: this, father: this.parent || topItems.value, start: idx, length })
+            return this;
         }
         /**
          * 导出----提取实例属性
@@ -287,7 +292,7 @@ export const useItemsStore = defineStore('items', () => {
         createDragItem,
         scaleRatio,
         extractProject,
-        initProject, 
+        initProject,
         designerRect,
         username
     }

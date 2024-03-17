@@ -14,8 +14,8 @@
     </div>
     <!-- 子节点 -->
     <div class="children">
-      <DragItem :tabNum="tabNum" :itemData="topItem" :level="props.level + 1"
-        v-for=" topItem  of  props.itemData.children " :key="topItem.id">
+      <DragItem :itemData="topItem" :level="props.level + 1" v-for=" topItem  of  props.itemData.children "
+        :key="topItem.id">
       </DragItem>
     </div>
     <!-- 起点节点保存连线 -->
@@ -46,6 +46,7 @@ import { storeToRefs } from 'pinia';
 import eventBus from '@/utils/eventBus';
 import { addSelectedItem, removeItem, selectedItemsMove } from '@/utils/multiSelected'
 import Line from '@/components/Line'
+import { record } from '@/utils/revocableOp';
 const itemsStore = useItemsStore()
 const props = defineProps({
   itemData: {
@@ -55,10 +56,6 @@ const props = defineProps({
     }
   },
   level: {
-    type: Number,
-    default: 0
-  },
-  tabNum: {
     type: Number,
     default: 0
   }
@@ -132,6 +129,11 @@ async function handleEditTitle(e) {
     el.focus()
     //选中所有 & 可能用户会修改内容
     customSelect(el)
+    record('edit', {
+      itemData: props.itemData,
+      oldTitle: props.itemData.title,
+      el
+    }) //记录
   }
 }
 // blur和keyup.enter.ctrl 修改结束 的函数
@@ -150,7 +152,8 @@ function afterHandleEditTitle(e) {
 // }
 //框选
 const maskRect = inject('maskRect')
-eventBus.subscribe('multiSelected', () => {
+eventBus.subscribe('multiSelected', multiSelectedCallback)
+function multiSelectedCallback() {
   if (!props.itemData.node) return;
   const dragItemRect = {
     width: props.itemData.node.getBoundingClientRect().width,
@@ -161,11 +164,14 @@ eventBus.subscribe('multiSelected', () => {
   if ((maskRect.height > dragItemRect.height / 2 && maskRect.top < dragItemRect.centerY && maskRect.top + maskRect.height > dragItemRect.centerY)
     && (maskRect.width > dragItemRect.width / 2 && maskRect.left < dragItemRect.centerX && maskRect.left + maskRect.width > dragItemRect.centerX)) {
     isSelectedItem.value = !isSelectedItem.value
+    console.log('selected level: ', props.level)
   }
-})
+
+}
 
 //处理tab -- isSelectedItem增加子节点
-watch(() => props.tabNum, () => {
+eventBus.subscribe('tab', tabCallback)
+function tabCallback() {
   if (isSelectedItem.value) {
     const newDragItem = itemsStore.createDragItem(props.itemData)
     isSelectedItem.value = false
@@ -178,18 +184,25 @@ watch(() => props.tabNum, () => {
       newDragItem.pos.left = props.itemData.rect.width + themeconf.value.horizonGap;
       newDragItem.pos.top = - newDragItem.rect.height / 2 + newDragItem.rect.height / 2;
     }
+    record('tab', { itemData: newDragItem }); //记录
   }
-})
-
+}
 /**
  * del键删除节点
  */
-eventBus.subscribe('delete', () => {
+eventBus.subscribe('del', delCallbacak, props.level)
+function delCallbacak() {
   if (isSelectedItem.value && dragItem.value) {
     isSelectedItem.value = false;
     props.itemData.del();
   }
-}, props.level)
+}
+
+onBeforeUnmount(() => {
+  eventBus.unsubscribe('multiSelected', multiSelectedCallback)
+  eventBus.unsubscribe('tab', tabCallback)
+  eventBus.unsubscribe('del', delCallbacak)
+})
 
 /**
  * 右键菜单 在item上触发时
