@@ -132,7 +132,6 @@ async function handleEditTitle(e) {
     record('edit', {
       itemData: props.itemData,
       oldTitle: props.itemData.title,
-      el
     }) //记录
   }
 }

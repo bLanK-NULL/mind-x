@@ -29,7 +29,7 @@ import eventBus from '@/utils/eventBus';
 import { saveToLocalForage } from '@/localForage/index'
 import { uploadProject } from '@/http/index.js'
 import { exportNodeToPDF } from '@/utils/exportPdf';
-import { withdraw } from '@/utils/revocableOp';
+import { withdraw, unwithdraw } from '@/utils/revocableOp';
 const itemsStore = useItemsStore()
 const { themeconf, scaleRatio, topItems } = storeToRefs(itemsStore)
 const { extractProject, designerRect, createDragItem } = itemsStore
@@ -222,14 +222,21 @@ function handleDel(e) {
 }
 window.addEventListener('keydown', handleDel)
 
+//ctrl+z撤回
 window.addEventListener('keydown', (e) => {
     if (e.ctrlKey && e.key === 'z') {
         e.preventDefault();
         e.stopPropagation();
         console.log('withdraw')
         withdraw();
+    } else if (e.ctrlKey && e.key === 'y') {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('unwithdraw')
+        unwithdraw();
     }
 })
+window.add
 </script>
 
 <style scoped>

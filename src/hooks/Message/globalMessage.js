@@ -1,8 +1,11 @@
 import { message } from 'ant-design-vue';
 const [messageApi, contextHolder] = message.useMessage();
 
+message.config({
+    duration: 1
+})
 const infoMsg = (msg) => {
-    messageApi.info(msg);
+    message.info(msg);
 };
 const successMsg = (msg) => {
     message.success(msg);

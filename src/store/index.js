@@ -110,7 +110,7 @@ export const useItemsStore = defineStore('items', () => {
             // 初始调用本方法时,parent.rect没数据
         }
         //删除当前节点 -- 子节点挂载到父节点上去
-        del() {
+        del(needRecord = true) {
             let idx;
             let length = this.children.length;
             if (this.parent) {
@@ -128,7 +128,7 @@ export const useItemsStore = defineStore('items', () => {
             }
             this.node.remove();
             this.node = null;
-            record('del', { itemData: this, father: this.parent || topItems.value, start: idx, length })
+            needRecord && record('del', { itemData: this, father: this.parent || topItems.value, start: idx, length })
             return this;
         }
         /**
