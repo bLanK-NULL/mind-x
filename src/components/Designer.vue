@@ -20,7 +20,7 @@
 
 
 <script setup>
-import { computed, nextTick, onBeforeMount, onMounted, provide, reactive, ref, toRef, watch, toRaw, getCurrentInstance, onBeforeUnmount } from 'vue';
+import { nextTick, onMounted, provide, reactive, ref, watch, onBeforeUnmount } from 'vue';
 import DragItem from '@/components/DragItem.vue';
 import { useItemsStore } from '@/store/index'
 import { storeToRefs } from 'pinia';

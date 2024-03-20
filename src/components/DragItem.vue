@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, reactive, ref, watchEffect, watch, onBeforeUpdate, toRef, inject, onBeforeMount, toRaw, onBeforeUnmount } from 'vue';
+import { computed, nextTick, onMounted, ref, watch, inject, onBeforeUnmount } from 'vue';
 import { customSelect } from '@/utils/customSelect.js'
 import { useItemsStore } from '@/store/index'
 import { storeToRefs } from 'pinia';

@@ -6,7 +6,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watchEffect, onMounted, toRaw } from 'vue';
+import { computed, ref, watchEffect, onMounted, } from 'vue';
 const props = defineProps({
     parentRect: {
         type: Object,

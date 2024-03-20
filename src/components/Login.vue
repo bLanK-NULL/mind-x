@@ -43,7 +43,7 @@
 </template>
 
 <script setup>
-import { reactive, computed, onMounted } from 'vue';
+import { reactive, computed, } from 'vue';
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
 import { successMsg, errorMsg } from '@/hooks/Message/globalMessage.js'
 import { login } from '@/http/index'
