@@ -33,12 +33,12 @@ async function getProjectFromServer(pname, stamp = 0) {
 
 }
 
-async function getAllProjectName() {
+async function getAllProject() {
     try {
-        const res = await $http.get('/getAllProjectName')
+        const res = await $http.get('/getAllProject')
         return res.data;
     } catch (err) {
-        console.error('请求 /getAllProjectName 失败', err)
+        console.error('请求 /getAllProject 失败', err)
         return [];
     }
 }
@@ -58,6 +58,6 @@ export {
     login,
     uploadProject,
     getProjectFromServer,
-    getAllProjectName,
+    getAllProject,
     getProjectByPname
 }

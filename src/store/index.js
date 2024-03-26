@@ -4,6 +4,7 @@ import { successMsg, errorMsg, infoMsg } from '@/hooks/Message/globalMessage'
 import { getFromLocalForage } from '@/localForage/index'
 import { getProjectFromServer } from '@/http/index'
 import { record } from '@/utils/revocableOp'
+import { genWithTemplate } from '@/utils/genWithTemplate'
 
 const uuidv4 = require('uuid').v4;
 const lightTheme = require(`@/theme/default.js`)
@@ -271,20 +272,18 @@ export const useItemsStore = defineStore('items', () => {
 
 
     //如果不导入，则自动初始化三个初始节点
-    async function initProject(pname) {
+    async function initProject(pname, { template }) {
         const isSuccess = await importProject(pname)
-        if (!isSuccess) {
-            successMsg('新项目创建中....')
-            const root = createDragItem(null)
-            createDragItem(root)
-            createDragItem(root)
-            nextTick(() => root.standardizeChildrenPos())
-        }
+        template && genWithTemplate(template)
         window.scrollTo(initialViewportPos.x, initialViewportPos.y)
     }
 
     //username
     const username = ref('')
+    function setUsername(val) {
+        username.value = val;
+    }
+
     return {
         themeconf,
         setTheme,
@@ -294,7 +293,8 @@ export const useItemsStore = defineStore('items', () => {
         extractProject,
         initProject,
         designerRect,
-        username
+        username,
+        setUsername,
     }
 
 })

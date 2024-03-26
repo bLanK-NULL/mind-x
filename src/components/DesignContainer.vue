@@ -23,9 +23,11 @@
   const { themeconf, topItems } = storeToRefs(itemstore)
   const { setTheme, createDragItem,initProject } = itemstore
   const route = useRoute();
-  console.log(route.query.pname)
+  // console.log(route.query.pname)
   //初始化 导入本地||生成3个初始节点
-  initProject(route.query.pname)
+  initProject(route.query.pname, {
+    template : route.params.template
+  })
   
   //白天模式和黑夜模式的图标
   const MyIcon = createFromIconfontCN({
