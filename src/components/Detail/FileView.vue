@@ -8,7 +8,8 @@
             <div :style="{ padding: '24px', background: '#fff', textAlign: 'center' }">
                 <a-typography-title :level="4" style="text-align: left">我的项目</a-typography-title>
                 <a-divider />
-                <Project-card :allProject :clickCallback="openProject"></Project-card>
+                <Project-card :allProject :clickCallback="openProject"
+                    @updateAllProjectInfo="updateAllProjectInfo"></Project-card>
                 <a-typography-title :level="4" style="text-align: left">模板</a-typography-title>
                 <a-divider />
                 <Project-card :allProject="allTemplate" :clickCallback="createWithTemplate"></Project-card>
@@ -35,6 +36,10 @@ onBeforeMount(() => {
         allProject.value = val.data.sort((a, b) => b.stamp - a.stamp)
     });
 })
+function updateAllProjectInfo(pname) {
+    const idx = allProject.value.findIndex(item => item.pname == pname);
+    allProject.value.splice(idx, 1);
+}
 
 function openProject(pname) {
     // router.push({ name: 'DesignContainer', query: { pname } })

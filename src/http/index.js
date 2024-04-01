@@ -54,10 +54,23 @@ async function getProjectByPname(pname) {
         return null;
     }
 }
+async function renameProject(oldPname, newPname) {
+    return $http.post('/renameProject', {
+        oldPname,
+        newPname
+    })
+}
+async function deleteProject(pname) {
+    return $http.post('/deleteProject', {
+        pname
+    })
+}
 export {
     login,
     uploadProject,
     getProjectFromServer,
     getAllProject,
-    getProjectByPname
+    getProjectByPname,
+    renameProject,
+    deleteProject
 }
