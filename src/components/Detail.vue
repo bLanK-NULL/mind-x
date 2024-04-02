@@ -29,7 +29,10 @@ const navList = [
 
 function createNewProject() {
     router.replace({ path: '/' })
-    window.open(router.resolve({ name: 'DesignContainer', query: { pname: +new Date } }).href, '_blank')
+    window.open(router.resolve({
+        name: 'DesignContainer',
+        query: { pname: +new Date }
+    }).href, '_blank')
 }
 </script>
 

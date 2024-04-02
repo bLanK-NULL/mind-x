@@ -8,18 +8,21 @@
             <div :style="{ padding: '24px', background: '#fff', textAlign: 'center' }">
                 <a-typography-title :level="4" style="text-align: left">我的项目</a-typography-title>
                 <a-divider />
-                <Project-card :allProject :clickCallback="openProject"
+                <Project-card :allProject :clickCallback="openProject" ref="step1Ref"
                     @updateAllProjectInfo="updateAllProjectInfo"></Project-card>
                 <a-typography-title :level="4" style="text-align: left">模板</a-typography-title>
                 <a-divider />
-                <Project-card :allProject="allTemplate" :clickCallback="createWithTemplate"></Project-card>
+                <Project-card :allProject="allTemplate" :clickCallback="createWithTemplate" :isTemplate='true'
+                    ref="step2Ref"></Project-card>
             </div>
         </a-layout-content>
     </a-layout>
+    <a-tour v-model:current="current" :open="openTour" :steps="steps" @close="openTour = false"
+        @finish="handleFinish" />
 </template>
 
 <script setup>
-import { ref, onBeforeMount } from 'vue';
+import { ref, onBeforeMount, onMounted, toRaw } from 'vue';
 import ProjectCard from '@/components/Detail/ProjectCard'
 import { getAllProject } from '@/http';
 import { useRouter } from 'vue-router';
@@ -36,7 +39,9 @@ onBeforeMount(() => {
         if (val.data) {
             allProject.value = val.data.sort((a, b) => b.stamp - a.stamp)
         }
-    });
+    }).then(() => {
+        openTour.value = true;
+    })
 })
 function updateAllProjectInfo(pname) {
     const idx = allProject.value.findIndex(item => item.pname == pname);
@@ -63,6 +68,27 @@ function createWithTemplate(pname) {
     }
 
 }
+
+const current = ref(0);
+const openTour = ref(false)
+const step1Ref = ref(null)
+const step2Ref = ref(null)
+onMounted(() => {
+})
+const steps = [
+    {
+        target: () => step1Ref && step1Ref.value.$el,
+        title: '右键',
+        description: '右键菜单包括重命名和删除项目',
+    }, {
+        target: () => step2Ref && step2Ref.value.$el,
+        title: '点击以模板新建项目'
+    }
+]
+function handleFinish() {
+    createWithTemplate('default')
+}
+
 </script>
 
 <style scoped>

@@ -32,6 +32,10 @@ const props = defineProps({
     clickCallback: {
         type: Function,
         default: () => { }
+    },
+    isTemplate: {
+        type: Boolean,
+        default: false
     }
 })
 const emits = defineEmits(['updateAllProjectInfo'])
@@ -44,7 +48,7 @@ const okType = ref('primary')
 const showInput = ref(true)
 let handler = () => { };
 
-const contextMenuInCard = [{
+const contextMenuInCard = !props.isTemplate ? [{
     title: '重命名项目',
     fn: () => {
         handler = handleRename;
@@ -62,7 +66,7 @@ const contextMenuInCard = [{
         showInput.value = false;
         open.value = true;
     }
-}]
+}] : [];
 
 function handleRename() {
     if (newPname.value == '') return;
@@ -108,6 +112,7 @@ function handleDelete() {
     width: 210px;
     height: 210px;
 }
+
 .img[data-flag="myProj"] {
     width: 128px;
     height: 128px;

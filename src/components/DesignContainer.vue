@@ -7,6 +7,7 @@
           <MyIconComp></MyIconComp>
         </template>
       </a-float-button>
+      <a-tour :steps="steps" :scrollIntoViewOptions="false"></a-tour>
     </div>
   </template>
   
@@ -52,6 +53,31 @@
       setTheme('dark')
     else setTheme('default')
   }
+
+  // 引导漫游,
+  const openSteps = ref(false)
+  onMounted(()=>openSteps.value = true)
+  const steps = [{
+      title: '自由拖动',
+      description: '按住节点自由拖动',
+      target: ()=> topItems.value.length && topItems.value[0].node,
+    },  {
+      title: '右键菜单',
+      description: '在节点上右键和在画布上打开不同菜单',
+      target: ()=> topItems.value.length && topItems.value[0].node,
+    }, {
+      title: '键盘快捷键',
+      description: h('ul',[
+        h('li', 'Space + mousemove 移动画布'),
+        h('li', 'Ctrl + wheel 缩放'),
+        h('li','Ctrl + S 保存项目'),
+        h('li', 'Tab 添加子节点')
+      ])
+    }, {
+      title: '框选',
+      description: '批量的选中、取消选中、拖动', 
+    },
+  ]
   </script>
    
   <style scoped>
