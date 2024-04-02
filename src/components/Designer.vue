@@ -28,8 +28,10 @@ import { successMsg, errorMsg, infoMsg } from '@/hooks/Message/globalMessage'
 import eventBus from '@/utils/eventBus';
 import { saveToLocalForage } from '@/localForage/index'
 import { uploadProject } from '@/http/index.js'
-import { exportNodeToPDF } from '@/utils/exportPdf';
+import { exportToPNG, getCoverPNG } from '@/utils/exportPdf';
 import { withdraw, unwithdraw } from '@/utils/revocableOp';
+import { useRoute } from 'vue-router';
+const route = useRoute();
 const itemsStore = useItemsStore()
 const { themeconf, scaleRatio, topItems } = storeToRefs(itemsStore)
 const { extractProject, designerRect, createDragItem } = itemsStore
@@ -187,21 +189,28 @@ const contextmenuListOnDesigner = [{
         }, { once: true })
     }
 }, {
-    title: '导出pdf',
-    fn: () => exportNodeToPDF(designer.value)
+    title: '导出png',
+    fn: () => {
+        exportToPNG(designer.value, route.query.pname)
+    }
 }]
 function saveProject(e) {
+    if (topItems.value.length === 0) {
+        errorMsg('项目为空!')
+        return;
+    }
     const data = JSON.stringify(extractProject())
     uploadProject(props.pname, data).then(res => {
         if (res && res.success) {
             successMsg('上传成功')
         } else {
-            successMsg('转为本地保存...')
+            infoMsg('转为本地保存')
             saveToLocal()
         }
+        // getCoverPNG(designer.value);
     })
 }
-function saveToLocal(e) {
+function saveToLocal() {
     // const waitingToSaveJson = extractProject();
     saveToLocalForage(props.pname, extractProject())
 }

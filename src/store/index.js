@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, onMounted, reactive, toRaw, onUpdated, nextTick } from 'vue'
 import { successMsg, errorMsg, infoMsg } from '@/hooks/Message/globalMessage'
-import { getFromLocalForage } from '@/localForage/index'
-import { getProjectFromServer } from '@/http/index'
+import { getFromLocalForage, deleteFromLocalForage } from '@/localForage/index'
+import { getProjectFromServer, uploadProject } from '@/http/index'
 import { record } from '@/utils/revocableOp'
 import { genWithTemplate } from '@/utils/genWithTemplate'
 
@@ -222,17 +222,25 @@ export const useItemsStore = defineStore('items', () => {
 
     // 导入本地保存的记录 -- return false 代表导入失败
     async function importProject(pname) {
-        // const project = JSON.parse(localStorage.getItem('mind-x'))
         let project = await getFromLocalForage(pname)
         if (project) {//本地有数据
             const res = await getProjectFromServer(pname, project.stamp)
-            if (res && res.success && res.data) {//服务器数据是最新的
-                project = JSON.parse(res.data)
+            if (res && res.data) {//远程数据是最新的
+                project = JSON.parse(res.data);
+            } else { // 本地的最新
+                setTimeout(() => {
+                    uploadProject(pname, JSON.stringify(project)).then(res => {
+                        if (res && res.success) {
+                            successMsg('同步成功🔄')
+                            deleteFromLocalForage(pname)
+                        }
+                    })
+                }, 0);
             }
 
         } else {//本地无数据
             const res = await getProjectFromServer(pname)
-            if (res && res.success && res.data) {
+            if (res && res.success && res.data) { // 远程有数据
                 project = JSON.parse(res.data)
             } else {
                 return false;

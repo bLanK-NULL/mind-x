@@ -15,5 +15,12 @@ async function getFromLocalForage(key) {
 
     return await localforage.getItem(key)
 }
+async function deleteFromLocalForage(key) {
+    return localforage.removeItem(key)
+}
 
-export { saveToLocalForage, getFromLocalForage }
+export {
+    saveToLocalForage,
+    getFromLocalForage,
+    deleteFromLocalForage
+}

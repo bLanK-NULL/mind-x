@@ -3,9 +3,10 @@
         <a-card hoverable v-for="(proj, idx) of allProject" :key="idx" class="pitems" @click="clickCallback(proj.pname)"
             @contextmenu="() => { curProj = proj; }" v-ctxmenu:[contextMenuInCard]>
             <template #cover>
-                <div style="display: flex; justify-content: center; align-items: center; ">
+                <div style="display: flex; justify-content: center; align-items: center; width: 210px;height: 210px;">
                     <img class="img" alt="example"
-                        :src="proj.img ? imagePath('./' + proj.img) : 'https://picsum.photos/210/210?' + idx" />
+                        :data-flag="(proj.img && proj.img.startsWith('template')) ? 'template' : 'myProj'"
+                        :src="proj.img ? imagePath('./' + proj.img) : imagePath('./cover.png')" />
                 </div>
             </template>
             <a-card-meta :title="proj.pname">
@@ -69,7 +70,7 @@ function handleRename() {
     renameProject(curProj.value.pname, newPname.value).then(res => {
         confirmLoading.value = false;
         if (res.data.success) {
-           curProj.value.pname = res.data.newPname
+            curProj.value.pname = res.data.newPname
             open.value = false;
             successMsg(res.data.message)
         } else {
@@ -106,5 +107,9 @@ function handleDelete() {
 .img {
     width: 210px;
     height: 210px;
+}
+.img[data-flag="myProj"] {
+    width: 128px;
+    height: 128px;
 }
 </style>

@@ -2,7 +2,7 @@ import { message } from 'ant-design-vue';
 const [messageApi, contextHolder] = message.useMessage();
 
 message.config({
-    duration: 1
+    duration: 2
 })
 const infoMsg = (msg) => {
     message.info(msg);

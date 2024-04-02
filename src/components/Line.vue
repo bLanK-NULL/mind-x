@@ -59,18 +59,40 @@ onMounted(() => {
     const ctx = myCanvas.value.getContext('2d')
     watchEffect(() => {
         // ctx.clearRect(0, 0, myCanvas.value.width, myCanvas.value.height);
-        ctx.beginPath();
-        ctx.moveTo(linePos.value.x1, linePos.value.y1);
-        ctx.lineTo(linePos.value.x2, linePos.value.y2);
-        ctx.strokeStyle = 'crimson';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
+        // ctx.beginPath();
+        // ctx.moveTo(linePos.value.x1, linePos.value.y1);
+        // ctx.lineTo(linePos.value.x2, linePos.value.y2);
+        // ctx.strokeStyle = 'crimson';
+        // ctx.lineWidth = 2;
+        // ctx.stroke();
+        drawBezierCurve({
+            x: linePos.value.x1,
+            y: linePos.value.y1,
+        }, {
+            x: linePos.value.x2,
+            y: linePos.value.y2
+        }, ctx)
     }, {
         flush: 'post'
     })
 })
-
+function drawBezierCurve(parentNode, childNode, ctx) {
+    ctx.beginPath();
+    // 移动到父节点的位置
+    ctx.moveTo(parentNode.x, parentNode.y);
+    // 计算控制点的坐标
+    const controlPoint1 = {
+        x: (parentNode.x + childNode.x) / 2,
+        y: parentNode.y
+    };
+    const controlPoint2 = {
+        x: (parentNode.x + childNode.x) / 2,
+        y: childNode.y
+    };
+    // 绘制三次贝塞尔曲线
+    ctx.bezierCurveTo(controlPoint1.x, controlPoint1.y, controlPoint2.x, controlPoint2.y, childNode.x, childNode.y);
+    ctx.stroke();
+}
 </script>
 
 <style lang="css" scoped>

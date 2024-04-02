@@ -33,7 +33,9 @@ const allTemplate = ref([{
 }])
 onBeforeMount(() => {
     getAllProject().then(val => {
-        allProject.value = val.data.sort((a, b) => b.stamp - a.stamp)
+        if (val.data) {
+            allProject.value = val.data.sort((a, b) => b.stamp - a.stamp)
+        }
     });
 })
 function updateAllProjectInfo(pname) {
