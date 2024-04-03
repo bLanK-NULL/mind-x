@@ -7,7 +7,7 @@
           <MyIconComp></MyIconComp>
         </template>
       </a-float-button>
-      <a-tour :steps="steps" :scrollIntoViewOptions="false"></a-tour>
+      <a-tour :open="openSteps" :steps="steps" :scrollIntoViewOptions="true" @close="openSteps = false"></a-tour>
     </div>
   </template>
   
@@ -56,7 +56,13 @@
 
   // 引导漫游,
   const openSteps = ref(false)
-  onMounted(()=>openSteps.value = true)
+  onMounted(()=>{
+    console.log(route.params)
+    if(route.params.template && !sessionStorage.getItem('tour-designer')) {
+      setTimeout(()=> openSteps.value = true, 0)
+      sessionStorage.setItem('tour-designer', true)
+    }
+  })
   const steps = [{
       title: '自由拖动',
       description: '按住节点自由拖动',
@@ -71,6 +77,8 @@
         h('li', 'Space + mousemove 移动画布'),
         h('li', 'Ctrl + wheel 缩放'),
         h('li','Ctrl + S 保存项目'),
+        h('li','Ctrl + Z 撤回'),
+        h('li','Ctrl + Y 反撤回'),
         h('li', 'Tab 添加子节点')
       ])
     }, {

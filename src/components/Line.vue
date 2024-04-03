@@ -77,6 +77,8 @@ onMounted(() => {
     })
 })
 function drawBezierCurve(parentNode, childNode, ctx) {
+    //清空画布
+    ctx.clearRect(0, 0, myCanvas.value.width, myCanvas.value.height);
     ctx.beginPath();
     // 移动到父节点的位置
     ctx.moveTo(parentNode.x, parentNode.y);

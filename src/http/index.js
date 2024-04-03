@@ -65,6 +65,9 @@ async function deleteProject(pname) {
         pname
     })
 }
+async function checkToken() {
+    return $http.get('/checkToken');
+}
 export {
     login,
     uploadProject,
@@ -72,5 +75,6 @@ export {
     getAllProject,
     getProjectByPname,
     renameProject,
-    deleteProject
+    deleteProject,
+    checkToken
 }

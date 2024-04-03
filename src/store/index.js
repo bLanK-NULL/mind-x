@@ -281,9 +281,16 @@ export const useItemsStore = defineStore('items', () => {
 
     //如果不导入，则自动初始化三个初始节点
     async function initProject(pname, { template }) {
-        const isSuccess = await importProject(pname)
-        template && genWithTemplate(template)
-        window.scrollTo(initialViewportPos.x, initialViewportPos.y)
+        // const isSuccess = await importProject(pname)
+        // template && genWithTemplate(template)
+        // window.scrollTo(initialViewportPos.x, initialViewportPos.y)
+        if (template) {
+            genWithTemplate(template)
+        } else
+            await importProject(pname)
+        setTimeout(() => {
+            window.scrollTo(initialViewportPos.x, initialViewportPos.y)
+        }, 0);
     }
 
     //username

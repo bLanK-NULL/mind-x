@@ -47,11 +47,12 @@ import { reactive, computed, } from 'vue';
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
 import { successMsg, errorMsg } from '@/hooks/Message/globalMessage.js'
 import { login } from '@/http/index'
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useItemsStore } from '@/store';
 const { username } = storeToRefs(useItemsStore())
 const router = useRouter()
+const route = useRoute();
 const formState = reactive({
     username: '',
     password: '',
@@ -65,9 +66,12 @@ function toLogin() {
         console.log(res)
         username.value = res.data.username;
         successMsg('登录成功')
-        router.push({
-            name: 'detail'
-        })
+        if (route.query.redirect)
+            router.push(route.query.redirect)
+        else
+            router.push({
+                name: 'detail'
+            })
     }).catch(err => {
         console.log(err)
         errorMsg('登录失败')

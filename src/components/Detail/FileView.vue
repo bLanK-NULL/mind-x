@@ -40,7 +40,10 @@ onBeforeMount(() => {
             allProject.value = val.data.sort((a, b) => b.stamp - a.stamp)
         }
     }).then(() => {
-        openTour.value = true;
+        if(!sessionStorage.getItem('tour-file-view')) {
+            openTour.value = true;
+            sessionStorage.setItem('tour-file-view',true)
+        }
     })
 })
 function updateAllProjectInfo(pname) {

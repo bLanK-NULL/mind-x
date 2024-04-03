@@ -1,4 +1,5 @@
 const { defineConfig } = require('@vue/cli-service')
+const TerserPlugin = require('terser-webpack-plugin');
 module.exports = defineConfig({
   transpileDependencies: true,
   devServer: {
@@ -13,5 +14,22 @@ module.exports = defineConfig({
       })
       return definitions
     })
+  },
+  configureWebpack: {
+    optimization: {
+      minimize: true,
+      minimizer: [
+        new TerserPlugin({
+          terserOptions: {
+            compress: {
+              drop_console: true, // 去除console.log
+            },
+            output: {
+              comments: false, // 去除注释
+            },
+          },
+        }),
+      ],
+    },
   }
 })
