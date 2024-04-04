@@ -35,7 +35,9 @@ const allTemplate = ref([{
     img: 'template_default.png'
 }])
 onBeforeMount(() => {
-    getAllProject().then(val => {
+    getAllProject().then(resp => {
+        // console.log(resp)
+        const val = resp.data;
         if (val.data) {
             allProject.value = val.data.sort((a, b) => b.stamp - a.stamp)
         }

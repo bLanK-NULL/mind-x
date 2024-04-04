@@ -1,3 +1,6 @@
+# 部署
+[Mind-X](http://1.94.9.34:3001/)
+
 ## 连线功能
 
 - 计算出 item 中心位置,计算出删 svg 的起始位置和 line 的结束位置
@@ -141,6 +144,7 @@ withDraw撤回
 unWithDraw反撤回
 
 
+## 跨标签通信
 
 
 
@@ -158,7 +162,7 @@ unWithDraw反撤回
 
 最后觉得早知道整个designer可以用svg来做，利用viewbox 来实现缩放
 
-## 利用微队列 - 优化
+## 利用微队列 - 优化(废弃)
 
 因为我页面中所有项都是由vue根据TopItems数组来生成的。所以当我刚刚调用createDragItem完还没有拿到dom节点。
 
@@ -183,4 +187,7 @@ unWithDraw反撤回
     }
 ```
 
-## 
+## 优化
+* nginx - gzip
+* http缓存 (not yet begun)
+* 

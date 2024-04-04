@@ -34,13 +34,14 @@ async function getProjectFromServer(pname, stamp = 0) {
 }
 
 async function getAllProject() {
-    try {
-        const res = await $http.get('/getAllProject')
-        return res.data;
-    } catch (err) {
-        console.error('请求 /getAllProject 失败', err)
-        return [];
-    }
+    // try {
+    //     const res = await $http.get('/getAllProject')
+    //     return res.data;
+    // } catch (err) {
+    //     console.error('请求 /getAllProject 失败', err)
+    //     return [];
+    // }
+    return $http.get('/getAllProject')
 }
 
 async function getProjectByPname(pname) {
@@ -65,9 +66,6 @@ async function deleteProject(pname) {
         pname
     })
 }
-async function checkToken() {
-    return $http.get('/checkToken');
-}
 export {
     login,
     uploadProject,
@@ -76,5 +74,4 @@ export {
     getProjectByPname,
     renameProject,
     deleteProject,
-    checkToken
 }

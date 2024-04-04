@@ -47,7 +47,7 @@
     return isDarkMode.value ? 'icon-anyemoshi' : 'icon-baitianmoshi';
   })
   const switchTheme = (e) => {
-    console.log(themeconf.value);
+    // console.log(themeconf.value);
     isDarkMode.value = !isDarkMode.value;
     if (isDarkMode.value)
       setTheme('dark')
@@ -57,7 +57,7 @@
   // 引导漫游,
   const openSteps = ref(false)
   onMounted(()=>{
-    console.log(route.params)
+    // console.log(route.params)
     if(route.params.template && !sessionStorage.getItem('tour-designer')) {
       setTimeout(()=> openSteps.value = true, 0)
       sessionStorage.setItem('tour-designer', true)

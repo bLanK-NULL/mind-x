@@ -63,7 +63,7 @@ const disabled = computed(() => {
 });
 function toLogin() {
     login(formState.username, formState.password).then(res => {
-        console.log(res)
+        // console.log(res)
         username.value = res.data.username;
         successMsg('登录成功')
         if (route.query.redirect)
@@ -73,7 +73,7 @@ function toLogin() {
                 name: 'detail'
             })
     }).catch(err => {
-        console.log(err)
+        // console.log(err)
         errorMsg('登录失败')
     })
 }

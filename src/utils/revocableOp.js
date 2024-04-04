@@ -8,7 +8,7 @@ class Stack {
     }
     record(type, wrapObj) {
         this._stack[this._p] = { type, ...wrapObj };
-        console.log('入栈', { type, ...wrapObj })
+        // console.log('入栈', { type, ...wrapObj })
         this._p++;
         //每次记录到了，就把后续可能存在的withdrawobj删掉。
         this._stack.length = this._p;

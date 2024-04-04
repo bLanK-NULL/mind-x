@@ -163,7 +163,7 @@ function multiSelectedCallback() {
   if ((maskRect.height > dragItemRect.height / 2 && maskRect.top < dragItemRect.centerY && maskRect.top + maskRect.height > dragItemRect.centerY)
     && (maskRect.width > dragItemRect.width / 2 && maskRect.left < dragItemRect.centerX && maskRect.left + maskRect.width > dragItemRect.centerX)) {
     isSelectedItem.value = !isSelectedItem.value
-    console.log('selected level: ', props.level)
+    // console.log('selected level: ', props.level)
   }
 
 }

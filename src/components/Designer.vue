@@ -236,12 +236,12 @@ window.addEventListener('keydown', (e) => {
     if (e.ctrlKey && e.key === 'z') {
         e.preventDefault();
         e.stopPropagation();
-        console.log('withdraw')
+        // console.log('withdraw')
         withdraw();
     } else if (e.ctrlKey && e.key === 'y') {
         e.preventDefault();
         e.stopPropagation();
-        console.log('unwithdraw')
+        // console.log('unwithdraw')
         unwithdraw();
     }
 })
