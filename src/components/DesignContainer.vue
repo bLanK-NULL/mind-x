@@ -20,9 +20,11 @@
   import { createFromIconfontCN } from '@ant-design/icons-vue';
   import { defineComponent } from 'vue';
   import { storeToRefs } from 'pinia';
+import { listenMsg } from '@/utils/crossTab';
   const itemstore = useItemsStore()
   const { themeconf, topItems } = storeToRefs(itemstore)
   const { setTheme, createDragItem,initProject } = itemstore
+  const router = useRouter();
   const route = useRoute();
   // console.log(route.query.pname)
   //初始化 导入本地||生成3个初始节点
@@ -69,7 +71,7 @@
       target: ()=> topItems.value.length && topItems.value[0].node,
     },  {
       title: '右键菜单',
-      description: '在节点上右键和在画布上打开不同菜单',
+      description: '在节画布上右键可以导出图片',
       target: ()=> topItems.value.length && topItems.value[0].node,
     }, {
       title: '键盘快捷键',
@@ -79,13 +81,35 @@
         h('li','Ctrl + S 保存项目'),
         h('li','Ctrl + Z 撤回'),
         h('li','Ctrl + Y 反撤回'),
-        h('li', 'Tab 添加子节点')
+        h('li', 'Tab 添加子节点'),
+        h('li', 'Delete 删除节点')
       ])
     }, {
       title: '框选',
       description: '批量的选中、取消选中、拖动', 
     },
   ]
+
+  onMounted(()=> {
+    // fileView 改名了 这边url也要改
+    listenMsg('rename',(data)=> { 
+      if(data.value.oldPname === route.query.pname) {
+          router.replace({
+          name: route.name,
+          query: {
+            ...route.query,
+            pname: data.value.newPname
+          }
+        })
+      }
+    })
+    listenMsg('delProj',(data)=> {
+      if(data.value.pname=== route.query.pname) {
+        //关闭此标签
+        window.close();
+      }
+    })
+  })
   </script>
    
   <style scoped>

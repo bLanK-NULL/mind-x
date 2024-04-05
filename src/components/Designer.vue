@@ -3,11 +3,11 @@
         'background-color': themeconf.baseBackgroundColor,
     }" v-ctxmenu:[contextmenuListOnDesigner]>
         <div class="selectMask" ref="selectMask" v-if="showSelectMask" :style="{
-        width: maskRect.width / scaleRatio + 'px',
-        height: maskRect.height / scaleRatio + 'px',
-        left: maskRect.leftAbs + 'px',
-        top: maskRect.topAbs + 'px',
-    }"></div>
+            width: maskRect.width / scaleRatio + 'px',
+            height: maskRect.height / scaleRatio + 'px',
+            left: maskRect.leftAbs + 'px',
+            top: maskRect.topAbs + 'px',
+        }"></div>
         <DragItem :itemData="topItem" :level=0 v-for="topItem of topItems" :key="topItem.id">
         </DragItem>
         <Teleport to="body">
@@ -31,6 +31,8 @@ import { uploadProject } from '@/http/index.js'
 import { exportToPNG, getCoverPNG } from '@/utils/exportPdf';
 import { withdraw, unwithdraw } from '@/utils/revocableOp';
 import { useRoute } from 'vue-router';
+import { sendMsg } from '@/utils/crossTab';
+import router from '@/router';
 const route = useRoute();
 const itemsStore = useItemsStore()
 const { themeconf, scaleRatio, topItems } = storeToRefs(itemsStore)
@@ -203,6 +205,17 @@ function saveProject(e) {
     uploadProject(props.pname, data).then(res => {
         if (res && res.success) {
             successMsg('上传成功')
+            console.log(route.query)
+            if (!!route.query.newProj) { // 还没有保存的新项目
+                sendMsg('reFetch', route.query)
+                router.replace({ 
+                    name: route.name,
+                    query: {
+                       ...route.query,
+                       newProj: false
+                    }
+                })
+            }
         } else {
             infoMsg('转为本地保存')
             saveToLocal()

@@ -31,7 +31,10 @@ function createNewProject() {
     router.replace({ path: '/' })
     window.open(router.resolve({
         name: 'DesignContainer',
-        query: { pname: +new Date }
+        query: {
+            pname: +new Date,
+            newProj: true
+        }
     }).href, '_blank')
 }
 </script>

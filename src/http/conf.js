@@ -22,7 +22,7 @@ $http.interceptors.request.use(config => {
     return config
 });
 $http.interceptors.response.use(response => {
-    console.log(router)
+    // console.log(router)
     if (response.data && response.data.code == 401) {
         infoMsg(response.data.message)
         router.push({

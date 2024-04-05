@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "analyzer": "cross-env use_analyzer=true npm run build"
   },
   "dependencies": {
     "ant-design-vue": "^4.1.2",
@@ -22,6 +23,8 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
-    "terser-webpack-plugin": "^5.3.10"
+    "cross-env": "^7.0.3",
+    "terser-webpack-plugin": "^5.3.10",
+    "webpack-bundle-analyzer": "^4.10.1"
   }
 }

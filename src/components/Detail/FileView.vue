@@ -22,10 +22,11 @@
 </template>
 
 <script setup>
-import { ref, onBeforeMount, onMounted, toRaw } from 'vue';
+import { ref, onBeforeMount, onMounted, toRaw, onBeforeUnmount } from 'vue';
 import ProjectCard from '@/components/Detail/ProjectCard'
 import { getAllProject } from '@/http';
 import { useRouter } from 'vue-router';
+import { listenMsg } from '@/utils/crossTab';
 const router = useRouter();
 
 const allProject = ref([])
@@ -34,7 +35,13 @@ const allTemplate = ref([{
     stamp: Infinity,
     img: 'template_default.png'
 }])
+let stopListen;
 onBeforeMount(() => {
+    reFetchProject();
+    stopListen = listenMsg('reFetch', reFetchProject)
+})
+onBeforeUnmount(() => stopListen());
+function reFetchProject() {
     getAllProject().then(resp => {
         // console.log(resp)
         const val = resp.data;
@@ -42,12 +49,13 @@ onBeforeMount(() => {
             allProject.value = val.data.sort((a, b) => b.stamp - a.stamp)
         }
     }).then(() => {
-        if(!sessionStorage.getItem('tour-file-view')) {
+        if (!sessionStorage.getItem('tour-file-view')) {
             openTour.value = true;
-            sessionStorage.setItem('tour-file-view',true)
+            sessionStorage.setItem('tour-file-view', true)
         }
     })
-})
+}
+
 function updateAllProjectInfo(pname) {
     const idx = allProject.value.findIndex(item => item.pname == pname);
     allProject.value.splice(idx, 1);
@@ -66,7 +74,7 @@ function createWithTemplate(pname) {
         case 'default':
             window.open(router.resolve({
                 name: 'DesignContainer',
-                query: { pname: pname + "_" + Date.now() },
+                query: { pname: pname + "_" + Date.now(), newProj: true },
                 params: { template: pname }
             }).href, '_blank')
             break;

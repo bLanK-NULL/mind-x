@@ -23,6 +23,7 @@
 import { renameProject, deleteProject } from '@/http/index'
 import { ref } from 'vue';
 import { errorMsg, successMsg } from '@/hooks/Message/globalMessage';
+import { sendMsg } from '@/utils/crossTab';
 const imagePath = require.context('@/assets', true, /\.png$/);
 const props = defineProps({
     allProject: {
@@ -74,9 +75,15 @@ function handleRename() {
     renameProject(curProj.value.pname, newPname.value).then(res => {
         confirmLoading.value = false;
         if (res.data.success) {
+            const oldPname = curProj.value.pname;
             curProj.value.pname = res.data.newPname
             open.value = false;
-            successMsg(res.data.message)
+            successMsg(res.data.message);
+            // 改名后同步到designerContainer
+            sendMsg('rename', {
+                newPname: newPname.value,
+                oldPname
+            })
         } else {
             errorMsg(res.data.message);
         }
@@ -90,7 +97,10 @@ function handleDelete() {
             emits('updateAllProjectInfo', curProj.value.pname)
             open.value = false;
             successMsg(res.data.message);
-
+            //删除后同步到designerContainer
+            sendMsg('delProj',{
+                pname: curProj.value.pname
+            })
         } else {
             errorMsg(res.data.message);
         }
