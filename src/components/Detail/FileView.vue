@@ -2,15 +2,15 @@
     <a-layout :style="{ marginLeft: '200px', height: '100vh' }">
         <a-layout-header
             :style="{ background: '#fff', padding: 0, display: 'flex', alignItems: 'center', paddingLeft: '20px' }">
-            <a-typography-title :level="2">文件</a-typography-title>
+            <h2>文件</h2>
         </a-layout-header>
         <a-layout-content :style="{ margin: '24px 16px 0', overflow: 'auto', background: '#fff' }">
             <div :style="{ padding: '24px', background: '#fff', textAlign: 'center' }">
-                <a-typography-title :level="4" style="text-align: left">我的项目</a-typography-title>
+                <h3 style="text-align: left;">我的项目</h3>
                 <a-divider />
                 <Project-card :allProject :clickCallback="openProject" ref="step1Ref"
                     @updateAllProjectInfo="updateAllProjectInfo"></Project-card>
-                <a-typography-title :level="4" style="text-align: left">模板</a-typography-title>
+                <h3 style="text-align: left;">模板</h3>
                 <a-divider />
                 <Project-card :allProject="allTemplate" :clickCallback="createWithTemplate" :isTemplate='true'
                     ref="step2Ref"></Project-card>
