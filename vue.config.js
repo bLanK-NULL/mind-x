@@ -32,6 +32,17 @@ module.exports = defineConfig({
           },
         }),
       ],
+      splitChunks: {
+        cacheGroups: {
+          customChunk: {
+            test: (module) => {
+              return /node_modules[\\/]ant-design-vue[\\/]/.test(module.context) && /Card|CardMeta|Input|Menu|MenuItem/.test(module.request);
+            },
+            name: 'customChunk',
+            chunks: 'all',
+          },
+        },
+      },
     },
   }
 })

@@ -191,4 +191,4 @@ unWithDraw反撤回
 * nginx - gzip
 * http缓存 (not yet begun)
 * 路由懒加载
-* 
+* 组件库部分映入, 依旧很大890KB,再splitChunks分包
