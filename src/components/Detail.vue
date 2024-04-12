@@ -13,7 +13,11 @@
             </a-menu>
         </a-layout-sider>
         <!-- <component :is="FileView"></component> -->
-        <router-view></router-view>
+        <router-view #default="{ Component }">
+            <keep-alive>
+                <component :is="Component"></component>
+            </keep-alive>
+        </router-view>
     </a-layout>
 </template>
 

@@ -258,7 +258,6 @@ window.addEventListener('keydown', (e) => {
         unwithdraw();
     }
 })
-window.add
 </script>
 
 <style scoped>

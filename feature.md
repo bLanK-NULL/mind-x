@@ -186,9 +186,16 @@ unWithDraw反撤回
         }
     }
 ```
+##
+跨标签
+Detail页改名或删除, 打开的designer 要改名或关闭
+designer 新保存项目, Detail页要展示
+
 
 ## 优化
 * nginx - gzip
 * http缓存 (not yet begun)
 * 路由懒加载
 * 组件库部分映入, 依旧很大890KB,再splitChunks分包
+* keep-alive detail页切换文件和社区时,不用再请求项目列表
+
