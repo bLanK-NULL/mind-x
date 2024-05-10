@@ -198,4 +198,9 @@ designer 新保存项目, Detail页要展示
 * 路由懒加载
 * 组件库部分映入, 依旧很大890KB,再splitChunks分包
 * keep-alive detail页切换文件和社区时,不用再请求项目列表
+* 事件委托 `event.composedPath()` 或 `pointerEvent` 
+  * 返回一个数组, 依次是 
+  * 指定元素是否可以是鼠标事件的target `div.style.pointerEvent = 'none'`;
+    * 注意此属性会继承如果用来做事件委托,需要把子元素 修改回`auto`
+* 防抖
 
