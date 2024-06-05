@@ -244,7 +244,7 @@ function handleDel(e) {
 }
 window.addEventListener('keydown', handleDel)
 
-//ctrl+z撤回
+//ctrl+z撤回 && ctrl+y 反撤回
 window.addEventListener('keydown', (e) => {
     if (e.ctrlKey && e.key === 'z') {
         e.preventDefault();
